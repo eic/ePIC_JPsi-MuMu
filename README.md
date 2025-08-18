@@ -25,3 +25,11 @@ Process the lAger output through the afterburner using the config **ip6_hiacc_27
 ```
 abconv -p ip6_hiacc_275x10 <OUTPUT_DIRECTORY>/lager-vmp-00mrad.jpsi-10on250.4pi.disp-jpsi-00-muon.run00001-lumi10.hepmc -o <OUTPUT_DIRECTORY>/ab_output-00mrad.jpsi-10on250.4pi.disp-jpsi-00-muon.run00001-lumi10
 ```
+
+### hepmc3ascii2root
+
+For both configurations, the output file was converted to a .hepmc3.tree.root file, and renamed to comply with simulation campaign naming.
+
+```
+./hepmc3ascii2root <OUTPUT_DIRECTORY>/ab_output-00mrad.jpsi-10on<PROTON ENERGY>.4pi.disp-jpsi-00-muon.run00001-lumi10.hepmc <OUTPUT_DIRECTORY>/lAger_v3.6.1_DVMP_JPsi_10x<PROTON ENERGY>ep_q2_1to50.hepmc3.tree.root
+```
