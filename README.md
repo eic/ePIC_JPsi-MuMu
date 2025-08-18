@@ -13,7 +13,7 @@ Run with the [.json file](https://github.com/smithalex0024/ePIC_JPsi/blob/main/l
 Process the lAger output through the afterburner using the config **ip6_hiacc_100x10**
 
 ```
-abconv -p ip6_hiacc_100x10 <OUTPUT_DIRECTORY>/lager-vmp-00mrad.jpsi-10on130.4pi.disp-jpsi-00-muon.run00001-lumi1.hepmc -o <OUTPUT_DIRECTORY>/ab_output-00mrad.jpsi-10on130.4pi.disp-jpsi-00-muon.run00001-lumi10
+abconv -p ip6_hiacc_100x10 <OUTPUT_DIRECTORY>/lager-vmp-00mrad.jpsi-10on130.4pi.disp-jpsi-00-muon.run00001-lumi10.hepmc -o <OUTPUT_DIRECTORY>/ab_output-00mrad.jpsi-10on130.4pi.disp-jpsi-00-muon.run00001-lumi10
 ```
 
 ### 10x250
@@ -23,5 +23,5 @@ Run with the [.json file](https://github.com/smithalex0024/ePIC_JPsi/blob/main/l
 Process the lAger output through the afterburner using the config **ip6_hiacc_275x10**
 
 ```
-abconv -p ip6_hiacc_275x10 <OUTPUT_DIRECTORY>/lager-vmp-00mrad.jpsi-10on250.4pi.disp-jpsi-00-muon.run00001-lumi1.hepmc -o <OUTPUT_DIRECTORY>/ab_output-00mrad.jpsi-10on250.4pi.disp-jpsi-00-muon.run00001-lumi10
+abconv -p ip6_hiacc_275x10 <OUTPUT_DIRECTORY>/lager-vmp-00mrad.jpsi-10on250.4pi.disp-jpsi-00-muon.run00001-lumi10.hepmc -o <OUTPUT_DIRECTORY>/ab_output-00mrad.jpsi-10on250.4pi.disp-jpsi-00-muon.run00001-lumi10
 ```
