@@ -44,7 +44,7 @@
 void trackAnalysis()
   {
 
-    TString infile="eicReconOutput/EICreconOut_JPsiMuMu_1ifb_10x250ep_Pruned.root";
+    TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x250ep_Pruned.root";
     std::string filename = infile.Data();
     std::string beam_config;
     std::string marker = "_Pruned.root";
@@ -65,12 +65,13 @@ void trackAnalysis()
     }
 
     double protonEnergy = std::stod(proton_energy); 
-    double lumi = 1.0; // Luminosity in fb^-1, adjust as needed
+    double lumi = 10.0; // Luminosity in fb^-1, adjust as needed
 
     std::cout << "Extracted beam config: " << beam_config << std::endl;
     std::cout << "Proton energy: " << protonEnergy << std::endl;
 
-    std::string outfilename = "outputs/trackAnalysisOutput_" + beam_config + ".root";
+    int lumi_int = static_cast<int>(lumi);
+    std::string outfilename = "outputs/trackAnalysisOutput_" + std::to_string(lumi_int) + "ifb_" + beam_config + ".root";
 
     // Set output file for the histograms
     TFile *ofile = TFile::Open(outfilename.c_str(),"RECREATE");
@@ -116,6 +117,12 @@ void trackAnalysis()
     TTreeReaderArray<unsigned int> recoAssoc(tree_reader, "ReconstructedChargedParticleAssociations.recID");
     TTreeReaderArray<unsigned int> simuAssoc(tree_reader, "ReconstructedChargedParticleAssociations.simID");
 
+    // Get B0 Information
+    TTreeReaderArray<unsigned int> recoAssocB0(tree_reader, "B0ECalClusterAssociations.recID");
+    TTreeReaderArray<unsigned int> simuAssocB0(tree_reader, "B0ECalClusterAssociations.simID");
+    TTreeReaderArray<float> B0Eng(tree_reader, "B0ECalClusters.energy");
+    TTreeReaderArray<float> B0z(tree_reader, "B0ECalClusters.position.z");
+
     // Define Eta Histograms
 
     TH1D *electronEta = new TH1D("electronEta", " #eta of Thrown Electrons",150,-15.,15.);
@@ -133,7 +140,7 @@ void trackAnalysis()
     TH1D *JPsiEta = new TH1D("JPsiEta", " #eta of Thrown J/PSi",100,-5.,5.);
     TH1D *matchedJPsiEta = new TH1D("matchedJPsiEta", " #eta of Thrown J/PSi That Have Matching Track",100,-5.,5.);
     TH1D *JPsiEff = new TH1D("JPsiEff","Efficency;  #eta",100,-5.,5.);
-    
+
     // Define Momentum Histograms
 
     TH1D *electronMomHist = new TH1D("electronMomHist","Momentum of Thrown Electrons;Momentum",100,-100.,100.);
@@ -374,6 +381,22 @@ void trackAnalysis()
                           muMinus4MomR.SetPxPyPzE(trackMomX[recoAssoc[j]],trackMomY[recoAssoc[j]],trackMomZ[recoAssoc[j]], trackEng[recoAssoc[j]]); // recoAssoc[j] is the index of the matched ReconstructedChargedParticle
                           
                         }
+                      else
+                        {
+                          for (int iTtrack = 0; iTtrack < ttrackMomX.GetSize(); iTtrack++) // Look for far-forwards tracks
+                          {
+                            TVector3 trecMom(ttrackMomX[iTtrack],ttrackMomY[iTtrack],ttrackMomZ[iTtrack]);
+                            ROOT::Math::PxPyPzEVector trec4Mom(ttrackMomX[iTtrack],ttrackMomY[iTtrack],ttrackMomZ[iTtrack], ttrackEng[iTtrack]); 
+
+                            if ((ttrackPDG[iTtrack] == 13) && ttrackCharge[iTtrack] == -1)
+                            {
+                              muMinusMomR = trecMom;
+                              muMinus4MomR = trec4Mom;
+                              break; 
+
+                            }
+                          }                   
+                        }
                     }
                 } 
               if(pdg == 13 && partCharge[i] == 1) // Look at muons
@@ -389,6 +412,22 @@ void trackAnalysis()
                           muPlusMomR = TVector3(trackMomX[recoAssoc[j]],trackMomY[recoAssoc[j]],trackMomZ[recoAssoc[j]]); // recoAssoc[j] is the index of the matched ReconstructedChargedParticle
                           muPlus4MomR.SetPxPyPzE(trackMomX[recoAssoc[j]],trackMomY[recoAssoc[j]],trackMomZ[recoAssoc[j]], trackEng[recoAssoc[j]]); // recoAssoc[j] is the index of the matched ReconstructedChargedParticle
                           
+                        }
+                      else
+                        {
+                          for (int iTtrack = 0; iTtrack < ttrackMomX.GetSize(); iTtrack++) // Look for far-forwards tracks
+                          {
+                            TVector3 trecMom(ttrackMomX[iTtrack],ttrackMomY[iTtrack],ttrackMomZ[iTtrack]);
+                            ROOT::Math::PxPyPzEVector trec4Mom(ttrackMomX[iTtrack],ttrackMomY[iTtrack],ttrackMomZ[iTtrack], ttrackEng[iTtrack]); 
+
+                            if ((ttrackPDG[iTtrack] == 13) && ttrackCharge[iTtrack] == 1)
+                            {
+                              muPlusMomR = trecMom;
+                              muPlus4MomR = trec4Mom;
+                              break; 
+
+                            }
+                          }                   
                         }
                     }
                 }
@@ -406,7 +445,7 @@ void trackAnalysis()
                         scatp4MomR.SetPxPyPzE(trackMomX[recoAssoc[j]],trackMomY[recoAssoc[j]],trackMomZ[recoAssoc[j]], trackEng[recoAssoc[j]]); // recoAssoc[j] is the index of the matched ReconstructedChargedParticle
 
                       }
-                    else
+                    else if (scatpMomR.Mag() == 0)
                     {
                       for (int iTtrack = 0; iTtrack < ttrackMomX.GetSize(); iTtrack++) // Look for far-forwards tracks
                       {
@@ -417,10 +456,19 @@ void trackAnalysis()
                         {
                           scatpMomR = trecMom;
                           scatp4MomR = trec4Mom;
-                          break; 
+                          break;
 
                         }
                       }                   
+                    }
+                    else if (scatpMomR.Mag() == 0)
+                    {
+                      for (int k = 0; k < B0Eng.GetSize(); k++)
+                        if(B0Eng[k] > 10) // Look for hit in the B0
+                        {
+                          scatpMomR = scatpMomT; 
+                          scatp4MomR = scatp4MomT; 
+                        }                 
                     }
                   }
               }
@@ -500,7 +548,6 @@ void trackAnalysis()
           float deltaPhi_proton = TVector2::Phi_mpi_pi(scatpMomT.Phi() - scatpMomR.Phi());
           float deltaR_proton = TMath::Sqrt(deltaEta_proton*deltaEta_proton + deltaPhi_proton*deltaPhi_proton);
           matchedProtonTrackDeltaR->Fill(deltaR_proton);
-
         }
 
         if (muPlusMomR.Mag() > 0)
