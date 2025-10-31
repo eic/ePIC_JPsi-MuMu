@@ -33,3 +33,10 @@ For both configurations, the output file was converted to a .hepmc3.tree.root fi
 ```
 ./hepmc3ascii2root <OUTPUT_DIRECTORY>/ab_output-00mrad.jpsi-10on<PROTON ENERGY>.4pi.disp-jpsi-00-muon.run00001-lumi10.hepmc <OUTPUT_DIRECTORY>/lAger_v3.6.1_DVMP_JPsi_10x<PROTON ENERGY>ep_q2_1to50.hepmc3.tree.root
 ```
+
+### Output Files
+
+The resulting output files for both configurations, to be used for the simulation campaigns are located at:
+```
+/w/eic-scshelf2104/users/gbxalex/SimCampaign_Input
+```
