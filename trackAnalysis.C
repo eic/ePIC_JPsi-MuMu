@@ -123,6 +123,13 @@ void trackAnalysis()
     TTreeReaderArray<float> B0Eng(tree_reader, "B0ECalClusters.energy");
     TTreeReaderArray<float> B0z(tree_reader, "B0ECalClusters.position.z");
 
+    // Get Forward Detector Information
+    TTreeReaderArray<float> RPEng(tree_reader, "ForwardRomanPotRecParticles.energy");
+    TTreeReaderArray<float> RPMomX(tree_reader, "ForwardRomanPotRecParticles.momentum.x");
+    TTreeReaderArray<float> RPMomY(tree_reader, "ForwardRomanPotRecParticles.momentum.y");
+    TTreeReaderArray<float> RPMomZ(tree_reader, "ForwardRomanPotRecParticles.momentum.z");
+    TTreeReaderArray<float> OffMEng(tree_reader, "ForwardOffMRecParticles.energy");
+
     // Define Eta Histograms
 
     TH1D *electronEta = new TH1D("electronEta", " #eta of Thrown Electrons",150,-15.,15.);
@@ -143,34 +150,34 @@ void trackAnalysis()
 
     // Define Momentum Histograms
 
-    TH1D *electronMomHist = new TH1D("electronMomHist","Momentum of Thrown Electrons;Momentum",100,-100.,100.);
-    TH1D *matchedElectronMomHist = new TH1D("matchedElectronMomHist","Momentum of Thrown Electrons That Have Matching Track",100,-100.,100.);
-    TH1D *electronMomEff = new TH1D("electronMomEff","Efficency;Momentum",100,-100.,100.);
+    TH1D *electronMomHist = new TH1D("electronMomHist","Momentum of Thrown Electrons;Momentum (GeV/c)",100,-100.,100.);
+    TH1D *matchedElectronMomHist = new TH1D("matchedElectronMomHist","Momentum of Thrown Electrons That Have Matching Track;Momentum (GeV/c)",100,-100.,100.);
+    TH1D *electronMomEff = new TH1D("electronMomEff","Efficency;Momentum (GeV/c)",100,-100.,100.);
 
-    TH1D *protonMomHist = new TH1D("protonMomHist","Momentum of Thrown Protons;Momentum",100,-300.,300.);
-    TH1D *matchedProtonMomHist = new TH1D("matchedProtonMomHist","Momentum of Thrown Protons That Have Matching Track",100,-300.,300.);
-    TH1D *protonMomEff = new TH1D("protonMomEff","Efficency;Momentum",100,-300.,300.);
+    TH1D *protonMomHist = new TH1D("protonMomHist","Momentum of Thrown Protons;Momentum (GeV/c)",160,-20.,300);
+    TH1D *matchedProtonMomHist = new TH1D("matchedProtonMomHist","Momentum of Thrown Protons That Have Matching Track;Momentum (GeV/c)",160,-20.,300);
+    TH1D *protonMomEff = new TH1D("protonMomEff","Efficency;Momentum (GeV/c)",160,-20.,300);
 
-    TH1D *muonMomHist = new TH1D("muonMomHist","Momentum of Thrown Muons;Momentum",100,-300.,300.);
-    TH1D *matchedMuonMomHist = new TH1D("matchedMuonMomHist","Momentum of Thrown Muons That Have Matching Track",100,-300.,300.);
-    TH1D *muonMomEff = new TH1D("muonMomEff","Efficency;Momentum",100,-300.,300.);
+    TH1D *muonMomHist = new TH1D("muonMomHist","Momentum of Thrown Muons;Momentum (GeV/c)",160,-20.,300);
+    TH1D *matchedMuonMomHist = new TH1D("matchedMuonMomHist","Momentum of Thrown Muons That Have Matching Track;Momentum (GeV/c)",160,-20.,300);
+    TH1D *muonMomEff = new TH1D("muonMomEff","Efficency;Momentum (GeV/c)",160,-20.,300);
 
-    TH1D *JPsiMomHist = new TH1D("JPsiMomHist","Momentum of Thrown J/PSi;Momentum",100,-300.,300.);
-    TH1D *matchedJPsiMomHist = new TH1D("matchedJPsiMomHist","Momentum of Thrown J/PSi That Have Matching Track",100,-300.,300.);
-    TH1D *JPsiMomEff = new TH1D("JPsiMomEff","Efficency;Momentum",100,-300.,300.);
+    TH1D *JPsiMomHist = new TH1D("JPsiMomHist","Momentum of Thrown J/PSi;Momentum (GeV/c)",160,-20.,300);
+    TH1D *matchedJPsiMomHist = new TH1D("matchedJPsiMomHist","Momentum of Thrown J/PSi That Have Matching Track;Momentum (GeV/c)",160,-20.,300);
+    TH1D *JPsiMomEff = new TH1D("JPsiMomEff","Efficency;Momentum (GeV/c)",160,-20.,300);
 
     // Define 2D Histograms p vs eta
-    TH2D *electronEtaMom = new TH2D("electronEtaMom","Thrown Electrons;  #eta; Momentum",150,-15.,15.,100,-100.,100.);
-    TH2D *matchedElectronEtaMom = new TH2D("matchedElectronEtaMom","Thrown Electrons That Have Matching Track;  #eta; Momentum",150,-15.,15.,100,-100.,100.);
+    TH2D *electronEtaMom = new TH2D("electronEtaMom","Thrown Electrons;  #eta; Momentum (GeV/c)",150,-15.,15.,100,-100.,100.);
+    TH2D *matchedElectronEtaMom = new TH2D("matchedElectronEtaMom","Thrown Electrons That Have Matching Track;  #eta; Momentum (GeV/c)",150,-15.,15.,100,-100.,100.);
 
-    TH2D *protonEtaMom = new TH2D("protonEtaMom","Thrown Protons;  #eta; Momentum",150,-15.,15.,100,-300.,300.);
-    TH2D *matchedProtonEtaMom = new TH2D("matchedProtonEtaMom","Thrown Protons That Have Matching Track;  #eta; Momentum",150,-15.,15.,100,-300.,300.);
+    TH2D *protonEtaMom = new TH2D("protonEtaMom","Thrown Protons;  #eta; Momentum (GeV/c)",150,-15.,15.,160,-20.,300);
+    TH2D *matchedProtonEtaMom = new TH2D("matchedProtonEtaMom","Thrown Protons That Have Matching Track;  #eta; Momentum (GeV/c)",150,-15.,15.,160,-20.,300);
 
-    TH2D *muonEtaMom = new TH2D("muonEtaMom","Thrown Muons;  #eta; Momentum",100,-5.,5.,100,-300.,300.);
-    TH2D *matchedMuonEtaMom = new TH2D("matchedMuonEtaMom","Thrown Muons That Have Matching Track;  #eta; Momentum",100,-5.,5.,100,-300.,300.);
+    TH2D *muonEtaMom = new TH2D("muonEtaMom","Thrown Muons;  #eta; Momentum (GeV/c)",200,-10.,10.,160,-20.,300);
+    TH2D *matchedMuonEtaMom = new TH2D("matchedMuonEtaMom","Thrown Muons That Have Matching Track;  #eta; Momentum (GeV/c)",200,-10.,10.,160,-20.,300);
 
-    TH2D *JPsiEtaMom = new TH2D("JPsiEtaMom","Thrown J/PSi;  #eta; Momentum",100,-5.,5.,100,-300.,300.);
-    TH2D *matchedJPsiEtaMom = new TH2D("matchedJPsiEtaMom","Thrown J/PSi That Have Matching Track;  #eta; Momentum",100,-5.,5.,100,-300.,300.);
+    TH2D *JPsiEtaMom = new TH2D("JPsiEtaMom","Thrown J/PSi;  #eta; Momentum (GeV/c)",100,-5.,5.,160,-20.,300);
+    TH2D *matchedJPsiEtaMom = new TH2D("matchedJPsiEtaMom","Thrown J/PSi That Have Matching Track;  #eta; Momentum (GeV/c)",100,-5.,5.,160,-20.,300);
 
     // Define Delta R Histograms
 
@@ -185,21 +192,49 @@ void trackAnalysis()
     TH1D *matchedMuMuInvMass = new TH1D("matchedMuMuInvMass","Invariant Mass of Muon Pairs That Have Matching Track",100,0.,5.); // Invariant mass histogram
 
     // Define Kinematics Histograms
-    TH1D* trueQ2 = new TH1D("trueQ2","True Q2 Distribution",100,0.,50.);
-    TH1D* reconQ2 = new TH1D("reconQ2","Reconstructed Q2 Distribution",100,0.,50.);
+    TH1D* trueQ2 = new TH1D("trueQ^{2}","True Q^{2} Distribution; Q^{2} (GeV/c^{2})",100,0.,50.);
+    TH1D* reconQ2_DA = new TH1D("reconQ^{2}_DA","Reconstructed Q^{2} Distribution using the DA Method; Q^{2} (GeV/c^{2})",100,0.,50.);
+    TH1D* reconQ2_JB = new TH1D("reconQ^{2}_JB","Reconstructed Q^{2} Distribution using the JB Method; Q^{2} (GeV/c^{2})",100,0.,50.);
+    TH1D* reconQ2_e = new TH1D("reconQ^{2}_e","Reconstructed Q^{2} Distribution using the electron Method; Q^{2} (GeV/c^{2})",100,0.,50.);
+    TH1D* reconQ2_sigma = new TH1D("reconQ^{2}_sigma","Reconstructed Q^{2} Distribution using the sigma Method; Q^{2} (GeV/c^{2})",100,0.,50.);
 
-    TH1D* truet = new TH1D("truet","True t Distribution",100,0.,2.);
-    TH1D* reconT = new TH1D("reconT","Reconstructed t Distribution",100,0.,2.);
+    TH1D* deltaQ2_DA = new TH1D("deltaQ2_DA","Delta Q^{2} (Reconstructed - True) using the DA Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2}",100,-10.,10.);
+    TH1D* deltaQ2_JB = new TH1D("deltaQ2_JB","Delta Q^{2} (Reconstructed - True) using the JB Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2}",100,-10.,10.);
+    TH1D* deltaQ2_e = new TH1D("deltaQ2_e","Delta Q^{2} (Reconstructed - True) using the electron Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2}",100,-10.,10.);
+    TH1D* deltaQ2_sigma = new TH1D("deltaQ2_sigma","Delta Q^{2} (Reconstructed - True) using the sigma Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2}",100,-10.,10.);
 
-    TH1D* trueXbjk = new TH1D("trueXbjk","True xbj Distribution",100,0.,0.25);
-    TH1D* reconXbjk = new TH1D("reconXbjk","Reconstructed xbj Distribution",100,0.,0.25);
+    TH2D* reconQ2_DA_vs_trueQ2 = new TH2D("reconQ2_DA_vs_trueQ2","Reconstructed Q^{2} using the DA Method vs True Q^{2}; Q_{MC}^{2} (GeV/c^{2}); Q_{DA}^{2} (GeV/c^{2})",100,0.,50.,100,0.,50.);
+
+    TH1D* truet = new TH1D("truet","True t Distribution; t (GeV/c)",100,0.,2.);
+    TH1D* recont_eXBABE = new TH1D("recont_eXBABE","Reconstructed t Distribution using the eXBABE Method; t (GeV/c)",100,0.,2.);
+    TH1D* recont_eXPT = new TH1D("recont_eXPT","Reconstructed t Distribution using the eXPT Method; t (GeV/c)",100,0.,2.);
+    TH1D* recont_eX = new TH1D("recont_eX","Reconstructed t Distribution using the eX Method; t (GeV/c)",100,0.,2.);
+    TH1D* recont_BABE = new TH1D("recont_BABE","Reconstructed t Distribution using the BABE Method; t (GeV/c)",100,0.,2.);
+
+    TH1D* deltat_eXBABE = new TH1D("deltat_eXBABE","Delta t (Reconstructed - True) using the eXBABE Method; (t - t_{MC})/t_{MC}",100,-0.5,0.5);
+    TH1D* deltat_eXPT = new TH1D("deltat_eXPT","Delta t (Reconstructed - True) using the eXPT Method; (t - t_{MC})/t_{MC}",100,-0.5,0.5);
+    TH1D* deltat_eX = new TH1D("deltat_eX","Delta t (Reconstructed - True) using the eX Method; (t - t_{MC})/t_{MC}",100,-0.5,0.5);
+    TH1D* deltat_BABE = new TH1D("deltat_BABE","Delta t (Reconstructed - True) using the BABE Method; (t - t_{MC})/t_{MC}",100,-0.5,0.5);
+
+    TH2D* recont_eXBABE_vs_truet = new TH2D("recont_eXBABE_vs_truet","Reconstructed t using the eXBABE Method vs True t; t_{MC} (GeV/c); t_{eXBABE} (GeV/c)",100,0.,2.,100,0.,2.);
+
+    TH1D* truex = new TH1D("truex","True x Distribution",100,0.,0.25);
+    TH1D* reconx_DA = new TH1D("reconx_DA","Reconstructed x Distribution using the DA method; x",100,0.,0.25);
+    TH1D* reconx_JB = new TH1D("reconx_JB","Reconstructed x Distribution using the JB method; x",100,0.,0.25);
+    TH1D* reconx_e = new TH1D("reconx_e","Reconstructed x Distribution using the electron method; x",100,0.,0.25);
+    TH1D* reconx_sigma = new TH1D("reconx_sigma","Reconstructed x Distribution using the sigma method; x",100,0.,0.25);
+
+    TH1D* deltax_DA = new TH1D("deltax_DA","Delta x (Reconstructed - True) using the DA Method; (x - x_{MC})/x_{MC}",100,-1.,1.);
+    TH1D* deltax_JB = new TH1D("deltax_JB","Delta x (Reconstructed - True) using the JB Method; (x - x_{MC})/x_{MC}",100,-1.,1.);
+    TH1D* deltax_e = new TH1D("deltax_e","Delta x (Reconstructed - True) using the electron Method; (x - x_{MC})/x_{MC}",100,-1.,1.);
+    TH1D* deltax_sigma = new TH1D("deltax_sigma","Delta x (Reconstructed - True) using the sigma Method; (x - x_{MC})/x_{MC}",100,-1.,1.);
 
     TH1D* truet_XbjkA = new TH1D("truet_XbjkA","True t distribution with bjorken x binning",100,0.,2.);
-    TH1D* reconT_XbjkA = new TH1D("reconT_XbjkA","Reconstructed t distribution with bjorken x binning",100,0.,2.);
+    TH1D* recont_XbjkA = new TH1D("recont_XbjkA","Reconstructed t distribution with bjorken x binning",100,0.,2.);
     TH1D* truet_XbjkB = new TH1D("truet_XbjkB","True t distribution with bjorken x binning",100,0.,2.);
-    TH1D* reconT_XbjkB = new TH1D("reconT_XbjkB","Reconstructed t distribution with bjorken x binning",100,0.,2.);
+    TH1D* recont_XbjkB = new TH1D("recont_XbjkB","Reconstructed t distribution with bjorken x binning",100,0.,2.);
     TH1D* truet_XbjkC = new TH1D("truet_XbjkC","True t distribution with bjorken x binning",100,0.,2.);
-    TH1D* reconT_XbjkC = new TH1D("reconT_XbjkC","Reconstructed t distribution with bjorken x binning",100,0.,2.);
+    TH1D* recont_XbjkC = new TH1D("recont_XbjkC","Reconstructed t distribution with bjorken x binning",100,0.,2.);
 
     // Define 3 and 4-momentum vectors for particles
 
@@ -231,9 +266,10 @@ void trackAnalysis()
     TVector3 JPsiMomR;
     ROOT::Math::PxPyPzEVector JPsi4MomR;
 
-    double Q2_truth, Q2_rec;
-    double t_truth, t_rec;
-    double xbjk_truth, xbjk_rec;
+    double Q2_truth, Q2_DA, Q2_JB, Q2_e, Q2_sigma;
+    double t_truth, t_eXBABE, t_eXPT, t_eX, t_BABE;
+    double x_truth, x_DA, x_JB, x_e, x_sigma;
+    double y_truth, y_DA, y_JB, y_e, y_sigma;
     double partEng;
 
     // Defining initial colliding beams
@@ -297,11 +333,25 @@ void trackAnalysis()
 
       // Reset kinematic variables
       Q2_truth = 0.;
-      Q2_rec = 0.;
+      Q2_DA = 0.;
+      Q2_JB = 0.;
+      Q2_e = 0.;
+      Q2_sigma = 0.;
       t_truth = 0.;
-      t_rec = 0.;
-      xbjk_truth = 0.;
-      xbjk_rec = 0.;
+      t_eXBABE = 0.;
+      t_eXPT = 0.;
+      t_eX = 0.;
+      t_BABE = 0.;
+      x_truth = 0.;
+      x_DA = 0.;
+      x_JB = 0.;
+      x_e = 0.;
+      x_sigma = 0.;
+      y_truth = 0.;
+      y_DA = 0.;
+      y_JB = 0.;
+      y_e = 0.;
+      y_sigma = 0.;
 
       for(unsigned int i=0; i<partGenStat.GetSize(); i++) // Loop over thrown particles
         {
@@ -434,43 +484,71 @@ void trackAnalysis()
               if(pdg == 2212)
               {
                 scatpMomT = TVector3(partMomX[i],partMomY[i],partMomZ[i]);
-                scatp4MomT.SetPxPyPzE(partMomX[i],partMomY[i],partMomZ[i], partEng);
+                scatpMomT.RotateY(0.025);
+                scatp4MomT.SetPxPyPzE(scatpMomT.X(), scatpMomT.Y(), scatpMomT.Z() , partEng);
 
                 // Loop over associations to find matching ReconstructedChargedParticle
                 for(unsigned int j=0; j<simuAssoc.GetSize(); j++)
                   {
                     if(simuAssoc[j] == i) // Find association index matching the index of the thrown particle we are looking at
                       {
+                        //std::cout << "Proton found with energy: " << partEng << " GeV" << std::endl;
                         scatpMomR = TVector3(trackMomX[recoAssoc[j]],trackMomY[recoAssoc[j]],trackMomZ[recoAssoc[j]]); // recoAssoc[j] is the index of the matched ReconstructedChargedParticle
                         scatp4MomR.SetPxPyPzE(trackMomX[recoAssoc[j]],trackMomY[recoAssoc[j]],trackMomZ[recoAssoc[j]], trackEng[recoAssoc[j]]); // recoAssoc[j] is the index of the matched ReconstructedChargedParticle
 
                       }
-                    else if (scatpMomR.Mag() == 0)
-                    {
+                  }
+                  if (scatpMomR.Mag() > 50) continue;
+                    
                       for (int iTtrack = 0; iTtrack < ttrackMomX.GetSize(); iTtrack++) // Look for far-forwards tracks
                       {
                         TVector3 trecMom(ttrackMomX[iTtrack],ttrackMomY[iTtrack],ttrackMomZ[iTtrack]);
                         ROOT::Math::PxPyPzEVector trec4Mom(ttrackMomX[iTtrack],ttrackMomY[iTtrack],ttrackMomZ[iTtrack], ttrackEng[iTtrack]); 
 
-                        if ((ttrackPDG[iTtrack] == 0 || ttrackPDG[iTtrack] == 2212) && trec4Mom.Eta() >4.0 && ttrackCharge[iTtrack] == 1)
+                        if ((ttrackPDG[iTtrack] == 0 || ttrackPDG[iTtrack] == 2212) && trec4Mom.Eta() >4.0 && ttrackCharge[iTtrack] == 1 && ttrackEng[iTtrack] > 50)
                         {
+                          //std::cout << "Found positive particle in far-forward with energy: " << ttrackEng[iTtrack] << " GeV" << std::endl;
                           scatpMomR = trecMom;
                           scatp4MomR = trec4Mom;
                           break;
 
                         }
-                      }                   
-                    }
-                    else if (scatpMomR.Mag() == 0)
-                    {
-                      for (int k = 0; k < B0Eng.GetSize(); k++)
-                        if(B0Eng[k] > 10) // Look for hit in the B0
+                      }   
+
+                  if (scatpMomR.Mag() > 50) continue;
+                    for (int k = 0; k < B0Eng.GetSize(); k++)
+                      {
+                        if(B0Eng[k] > 50) // Look for hit in the B0
                         {
+                          //std::cout << "Found particle in B0 with energy: " << B0Eng[k] << " GeV" << std::endl;
                           scatpMomR = scatpMomT; 
                           scatp4MomR = scatp4MomT; 
-                        }                 
-                    }
-                  }
+                        }       
+                      }  
+
+                  if (scatpMomR.Mag() > 50) continue; //std::cout << "Proton not found in truth-seeded far-forward tracks" << std::endl;              
+                    for (int r = 0; r < RPEng.GetSize(); r++) // Look in the Roman Pots
+                      {
+                        if(RPEng[r] > 50) // Look for hit in the RP
+                        {
+                          //std::cout << "Found particle in RP with energy: " << RPEng[r] << " GeV" << std::endl;
+                          scatpMomR = scatpMomT; 
+                          scatp4MomR = scatp4MomT;
+                          break;
+                        }       
+                      }
+                      //std::cout << "Proton not found in B0" << std::endl;
+                  if (scatpMomR.Mag() > 50) continue;
+                  for (int m = 0; m < OffMEng.GetSize(); m++) // Look in the Off-Momentum Detectors
+                    {
+                      if(OffMEng[m] > 50) // Look for hit in the Off-Momentum Detectors
+                      {
+                        //std::cout << "Found particle in Off-Momentum Detectors with energy: " << OffMEng[m] << " GeV" << std::endl;
+                        scatpMomR = scatpMomT; 
+                        scatp4MomR = scatp4MomT; 
+                      }     
+                    }   
+                    
               }
           }    
         }
@@ -505,17 +583,17 @@ void trackAnalysis()
         JPsiMomHist->Fill(JPsiMomT.Mag());
         JPsiEtaMom->Fill(JPsiMomT.Eta(), JPsiMomT.Mag());
 
-        ROOT::Math::PxPyPzEVector virtphoton_truth  = (beamE4Mom - scatE4MomT);
-        Q2_truth = -1*(virtphoton_truth.mag2());
-        t_truth = -1*((virtphoton_truth - JPsi4MomT).mag2());
 
-        xbjk_truth = Q2_truth / (2* beamp4Mom.Dot(beamE4Mom - scatE4MomT));
+        Q2_truth = -(beamE4Mom - scatE4MomT).mag2();
+        t_truth = -1*((scatp4MomT - beamp4Mom).mag2());
+        y_truth =(beamp4Mom.Dot(beamE4Mom - scatE4MomT))/(beamp4Mom.Dot(beamE4Mom));
+        x_truth = Q2_truth/(4*beamE4Mom.E()*beamp4Mom.E()*y_truth);
         
-        //std::cout << "Event ID: " << eventID << " Q2: " << Q2_truth << " t: " << t_truth << " xbjk: " << xbjk_truth << std::endl;
+        //std::cout << "Event ID: " << eventID << " Q2: " << Q2_truth << " t: " << t_truth << " xbjk: " << x_truth << std::endl;
         
         trueQ2->Fill(Q2_truth);
         truet->Fill(t_truth); 
-        trueXbjk->Fill(xbjk_truth);
+        truex->Fill(x_truth);
 
         // Check if the scattered electron, proton, and muons have been found in the reconstructed tracks
         //std::cout << "Scattered Electron: " << scatEMomR.Mag() << " Scattered Proton: " << scatpMomR.Mag() << " Mu+ Momentum: " << muPlusMomR.Mag() << " Mu- Momentum: " << muMinusMomR.Mag() << std::endl;
@@ -600,48 +678,111 @@ void trackAnalysis()
 
         }
 
-        if (scatEMomR.Mag() > 0 && muPlusMomR.Mag() > 0 && muMinusMomR.Mag() > 0){ // if e', mu+, and mu- are in coincidence
+        if (scatEMomR.Mag() > 0 && muPlusMomR.Mag() > 0 && muMinusMomR.Mag() > 0 && scatpMomR.Mag() > 0){ // if e', p', mu+, and mu- are in coincidence
   
-          ROOT::Math::PxPyPzEVector virtphoton_rec = (beamE4Mom - scatE4MomR);
-          Q2_rec = -1*(virtphoton_rec.mag2()); 
-          t_rec = -1*((virtphoton_rec - JPsi4MomR).mag2());
-          xbjk_rec = Q2_rec / (2* beamp4Mom.Dot(beamE4Mom - scatE4MomR)); 
+          // Calculate kinematic variable
 
-          reconQ2->Fill(Q2_rec); 
-          reconT->Fill(t_rec); 
-          reconXbjk->Fill(xbjk_rec);
+          double delta_h = (JPsi4MomR.E() + scatp4MomR.E()) - (JPsi4MomR.Pz() + scatp4MomR.Pz());
+          double pt2_h = (pow((JPsi4MomR.Px()+scatp4MomR.Px()),2))+(pow((JPsi4MomR.Py()+scatp4MomR.Py()),2));
+          double alpha_e = tan((scatE4MomR.Theta()/2));
+          double alpha_h = delta_h/(sqrt(pt2_h));
+
+          ROOT::Math::PxPyPzEVector vec_t_XPT_sum = (scatE4MomR + JPsi4MomR);
+          TVector3 vec_t_XPT3 = TVector3(vec_t_XPT_sum.Px(), vec_t_XPT_sum.Py(), vec_t_XPT_sum.Pz());
+          vec_t_XPT3.RotateY(0.025);
+          ROOT::Math::PxPyPzEVector vec_t_XPT = ROOT::Math::PxPyPzEVector(vec_t_XPT3.X(), vec_t_XPT3.Y(), vec_t_XPT3.Z(), vec_t_XPT_sum.E());
+
+          ROOT::Math::PxPyPzEVector vec_PMiss_Rec = (beamE4Mom + beamp4Mom) - (scatE4MomR + JPsi4MomR);
+          ROOT::Math::PxPyPzEVector scatp4MomR_corr = ROOT::Math::PxPyPzEVector(vec_PMiss_Rec.P()*sin(scatp4MomT.Theta())*cos(scatp4MomT.Phi()), vec_PMiss_Rec.P()*sin(scatp4MomT.Theta())*sin(scatp4MomT.Phi()), vec_PMiss_Rec.P()*cos(scatp4MomT.Theta()), sqrt(pow(vec_PMiss_Rec.P(),2)+(pow(pMass,2))));
+
+          y_e =(beamp4Mom.Dot(beamE4Mom - scatE4MomR))/(beamE4Mom.Dot(beamE4Mom));
+          Q2_e = -(beamE4Mom - scatE4MomR).mag2();
+          x_e = Q2_e/(4*beamE4Mom.E()*beamE4Mom.E()*y_e);
+
+          y_JB = delta_h/(2*beamE4Mom.E());
+          Q2_JB = pt2_h/(1-y_JB);
+          x_JB = Q2_JB/(4*beamE4Mom.E()*beamE4Mom.E()*y_JB);
+
+          y_DA = (alpha_h)/(alpha_e + alpha_h);
+          Q2_DA = (4*beamE4Mom.E()*beamE4Mom.E())/(alpha_e*(alpha_e +alpha_h));
+          x_DA = Q2_DA/(4*beamE4Mom.E()*beamE4Mom.E()*y_DA);
+          
+          y_sigma = delta_h/(delta_h + (scatE4MomR.E()*(1-cos(scatE4MomR.Theta()))));
+          Q2_sigma = (pow(scatE4MomR.E(),2)*pow(sin(scatE4MomR.Theta()),2))/(1-y_sigma);
+          x_sigma = Q2_sigma/(4*beamE4Mom.E()*beamE4Mom.E()*y_sigma);
+
+          t_BABE = -1*((beamp4Mom - scatp4MomR).mag2());
+          t_eX = -1*(((beamE4Mom - scatE4MomR) - JPsi4MomR).mag2());
+          t_eXPT = (vec_t_XPT.Perp2()); // Rotate vetors prior to getting perpendicular component
+          t_eXBABE = -1*((beamp4Mom - scatp4MomR_corr).mag2());
+
+          // Fill kinematic histograms
+
+          trueQ2->Fill(Q2_truth);
+          reconQ2_e->Fill(Q2_e);
+          reconQ2_JB->Fill(Q2_JB);
+          reconQ2_DA->Fill(Q2_DA);
+          reconQ2_sigma->Fill(Q2_sigma);
+          deltaQ2_e->Fill((Q2_e - Q2_truth)/Q2_truth);
+          deltaQ2_JB->Fill((Q2_JB - Q2_truth)/Q2_truth);
+          deltaQ2_DA->Fill((Q2_DA - Q2_truth)/Q2_truth);
+          deltaQ2_sigma->Fill((Q2_sigma - Q2_truth)/Q2_truth);
+
+          reconQ2_DA_vs_trueQ2->Fill(Q2_truth, Q2_DA);
+
+          truet->Fill(t_truth);
+          recont_eXBABE->Fill(t_eXBABE);
+          recont_eXPT->Fill(t_eXPT);
+          recont_eX->Fill(t_eX);
+          recont_BABE->Fill(t_BABE);
+          deltat_eXBABE->Fill((t_eXBABE - t_truth)/t_truth);
+          deltat_eXPT->Fill((t_eXPT - t_truth)/t_truth);
+          deltat_eX->Fill((t_eX - t_truth)/t_truth);
+          deltat_BABE->Fill((t_BABE - t_truth)/t_truth);
+
+          recont_eXBABE_vs_truet->Fill(t_truth, t_eXBABE);
+
+          truex->Fill(x_truth);
+          reconx_e->Fill(x_e);
+          reconx_JB->Fill(x_JB);
+          reconx_DA->Fill(x_DA);
+          reconx_sigma->Fill(x_sigma);
+          deltax_e->Fill((x_e - x_truth)/x_truth);
+          deltax_JB->Fill((x_JB - x_truth)/x_truth);
+          deltax_DA->Fill((x_DA - x_truth)/x_truth);
+          deltax_sigma->Fill((x_sigma - x_truth)/x_truth);
         
         }
 
         if (1 <= Q2_truth && Q2_truth <= 50) // Check if Q2 is in the range of interest
         {
-          if (0.0016 <= xbjk_truth && xbjk_truth < 0.0025) // Check if xbjk is in the range of interest
+          if (0.0016 <= x_truth && x_truth < 0.0025) // Check if xbjk is in the range of interest
           {
             truet_XbjkA->Fill(t_truth);
           }
-          else if (0.016 <= xbjk_truth && xbjk_truth < 0.025)
+          else if (0.016 <= x_truth && x_truth < 0.025)
           {
             truet_XbjkB->Fill(t_truth);
           }
-          else if (0.16 <= xbjk_truth && xbjk_truth < 0.25)
+          else if (0.16 <= x_truth && x_truth < 0.25)
           {
             truet_XbjkC->Fill(t_truth);
           }
         }
 
-        if (1 <= Q2_rec && Q2_rec <= 50) // Check if Q2 is in the range of interest
+        if (1 <= Q2_DA && Q2_DA <= 50) // Check if Q2 is in the range of interest
         {
-          if (0.0016 <= xbjk_rec && xbjk_rec < 0.0025) // Check if xbjk is in the range of interest
+          if (0.0016 <= x_DA && x_DA < 0.0025) // Check if xbjk is in the range of interest
           {
-            reconT_XbjkA->Fill(t_rec);
+            recont_XbjkA->Fill(t_eXBABE);
           }
-          else if (0.016 <= xbjk_rec && xbjk_rec < 0.025)
+          else if (0.016 <= x_DA && x_DA < 0.025)
           {
-            reconT_XbjkB->Fill(t_rec);
+            recont_XbjkB->Fill(t_eXBABE);
           }
-          else if (0.16 <= xbjk_rec && xbjk_rec < 0.25)
+          else if (0.16 <= x_DA && x_DA < 0.25)
           {
-            reconT_XbjkC->Fill(t_rec);
+            recont_XbjkC->Fill(t_eXBABE);
           }
         }
         
@@ -666,23 +807,23 @@ void trackAnalysis()
     truet_XbjkA->SetMarkerStyle(20);
     truet_XbjkB->SetMarkerStyle(20);
     truet_XbjkC->SetMarkerStyle(20);
-    reconT_XbjkA->SetMarkerStyle(20);
-    reconT_XbjkB->SetMarkerStyle(20);
-    reconT_XbjkC->SetMarkerStyle(20);
+    recont_XbjkA->SetMarkerStyle(20);
+    recont_XbjkB->SetMarkerStyle(20);
+    recont_XbjkC->SetMarkerStyle(20);
 
     truet_XbjkA->SetMarkerColor(kRed);
     truet_XbjkB->SetMarkerColor(kBlue);
     truet_XbjkC->SetMarkerColor(kGreen);
-    reconT_XbjkA->SetMarkerColor(kRed);
-    reconT_XbjkB->SetMarkerColor(kBlue);
-    reconT_XbjkC->SetMarkerColor(kGreen);
+    recont_XbjkA->SetMarkerColor(kRed);
+    recont_XbjkB->SetMarkerColor(kBlue);
+    recont_XbjkC->SetMarkerColor(kGreen);
 
     truet_XbjkA->SetDrawOption("E1P");
     truet_XbjkB->SetDrawOption("E1P");
     truet_XbjkC->SetDrawOption("E1P");
-    reconT_XbjkA->SetDrawOption("E1P"); 
-    reconT_XbjkB->SetDrawOption("E1P");
-    reconT_XbjkC->SetDrawOption("E1P");
+    recont_XbjkA->SetDrawOption("E1P"); 
+    recont_XbjkB->SetDrawOption("E1P");
+    recont_XbjkC->SetDrawOption("E1P");
 
     // Write histograms to file
     ofile->cd();
@@ -742,20 +883,37 @@ void trackAnalysis()
     ofile->mkdir("kinematics");
     ofile->cd("kinematics");
     trueQ2->Write();
-    reconQ2->Write();
+    reconQ2_e->Write();
+    reconQ2_JB->Write();
+    reconQ2_DA->Write();
+    reconQ2_sigma->Write();
+    reconQ2_DA_vs_trueQ2->Write();
     truet->Write();
-    reconT->Write();
-    trueXbjk->Write();
-    reconXbjk->Write();
+    recont_eXBABE->Write();
+    recont_eXPT->Write();
+    recont_eX->Write();
+    recont_BABE->Write();
+    recont_eXBABE_vs_truet->Write();
+    truex->Write();
+    reconx_e->Write();
+    reconx_JB->Write();
+    reconx_DA->Write();
+    reconx_sigma->Write();
     ofile->cd("..");
-    ofile->mkdir("t_Xbjk");
-    ofile->cd("t_Xbjk");
-    truet_XbjkA->Write();
-    truet_XbjkB->Write();
-    truet_XbjkC->Write();
-    reconT_XbjkA->Write();
-    reconT_XbjkB->Write();
-    reconT_XbjkC->Write();
+    ofile->mkdir("kinematicDifferences");
+    ofile->cd("kinematicsDifferences");
+    deltaQ2_e->Write();
+    deltaQ2_JB->Write();
+    deltaQ2_DA->Write();
+    deltaQ2_sigma->Write();
+    deltat_eXBABE->Write();
+    deltat_eXPT->Write();
+    deltat_eX->Write();
+    deltat_BABE->Write();
+    deltax_e->Write();
+    deltax_JB->Write();
+    deltax_DA->Write();
+    deltax_sigma->Write();
     ofile->cd("..");
 
     ofile->Close(); // Close output file
