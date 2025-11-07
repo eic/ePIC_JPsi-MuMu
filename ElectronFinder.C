@@ -51,11 +51,11 @@ bool IsElectron(TVector3 trackMom, int simuID,
         }
     }
 
-
+    bool zMomCut = (trackMom.Z() < 0.0);
 
     bool CalEpCut = (ECalEnergy/trackMom.Mag() < 1.2 && ECalEnergy/trackMom.Mag() > 0.9);
 
-    if (CalEpCut)
+    if (CalEpCut && zMomCut)
     {
         return true;
     }

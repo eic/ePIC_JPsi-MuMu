@@ -40,6 +40,7 @@
 #include <TTreeReader.h>
 #include <TTreeReaderArray.h>
 #include <TLatex.h>
+#include <Math/Boost.h>
 
 #include "ePICStyle.C"
 #include "MuonFinder.C"
@@ -51,7 +52,7 @@ void DVMP_JPsi_Analysis()
 {
     gROOT->SetBatch(kTRUE);
     gROOT->ProcessLine("SetePICStyle()");
-    gStyle->SetOptStat(0);
+    //gStyle->SetOptStat(0);
 
     //TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x130ep_Pruned.root";
     TString infile="dis_background/DIS_Q2_1_10_10x130ep_Pruned.root";
@@ -197,6 +198,16 @@ void DVMP_JPsi_Analysis()
     TH1D *matchedProtonMomHist = new TH1D("matchedProtonMomHist","Momentum of Thrown Protons That Have Matching Track (GeV/c)" ,160,-20.,300);
     TH1D *protonMomEff = new TH1D("protonMomEff","Efficency;Momentum (GeV/c)",160,-20.,300);
 
+    TH1D *protonEMinusPzHist = new TH1D("protonEMinusPzHist","E - Pz of Thrown Protons;E - Pz (GeV)",160,-20.,300);
+    TH1D *matchedProtonEMinusPzHist = new TH1D("matchedProtonEMinusPzHist","E - Pz of Thrown Protons That Have Matching Track;E - Pz (GeV)",160,-20.,300);
+    TH1D *protonPtHist = new TH1D("protonPtHist","Pt of Thrown Protons;Pt (GeV/c)",100,0.,10.);
+    TH1D *matchedProtonPtHist = new TH1D("matchedProtonPtHist","Pt of Thrown Protons That Have Matching Track;Pt (GeV/c)",100,0.,10.);
+
+    TH1D *electronProtonEMinusPzHist = new TH1D("electronProtonEMinusPzHist","E - Pz of Thrown e+p System;E - Pz (GeV)",200,0.,200.);
+    TH1D *matchedElectronProtonEMinusPzHist = new TH1D("matchedElectronProtonEMinusPzHist","E - Pz of Thrown e+p System That Have Matching Tracks;E - Pz (GeV)",200,0.,200.);
+    TH1D *electronProtonPtHist = new TH1D("electronProtonPtHist","Pt of Thrown e+p System;Pt (GeV/c)",100,0.,10.);
+    TH1D *matchedElectronProtonPtHist = new TH1D("matchedElectronProtonPtHist","Pt of Thrown e+p System That Have Matching Tracks;Pt (GeV/c)",100,0.,10.);
+
     TH1D *muonMomHist = new TH1D("muonMomHist","Momentum of Thrown Muons;Momentum (GeV/c)",160,-20.,300);
     TH1D *matchedMuonMomHist = new TH1D("matchedMuonMomHist","Momentum of Thrown Muons That Have Matching Track (GeV/c)",160,-20.,300);
     TH1D *muonMomEff = new TH1D("muonMomEff","Efficency;Momentum (GeV/c)",160,-20.,300);
@@ -225,10 +236,14 @@ void DVMP_JPsi_Analysis()
     TH1D *matchedMuonTrackDeltaR = new TH1D("matchedMuonTrackDeltaR","Delta R Between Matching Thrown and Reconstructed Muon",5000,0.,5.);
     TH1D *matchedJPsiTrackDeltaR = new TH1D("matchedJPsiTrackDeltaR","Delta R Between Matching Thrown and Reconstructed J/PSi",5000,0.,5.);
 
-    // Define Invariant Mass Histograms
+    // Define Invariant Mass, Missing Mass, and Angle Histograms
+
+    TH1D *muonScatterAngle = new TH1D("muonScatterAngle","Scattering Angle of Thrown Muons; Scattering Angle (rad)",100,0.,7.);
 
     TH1D *invMassMuMu = new TH1D("invMassMuMu","Invariant Mass of MC Muon Pairs; Invariant Mass (GeV)",100,0.,5.); // Invariant mass histogram
     TH1D *matchedMuMuInvMass = new TH1D("matchedMuMuInvMass","Invariant Mass of Reconstructed Muon Pairs; Invariant Mass (GeV)",100,0.,5.); // Invariant mass histogram
+
+    TH1D *matchedMissingMassEpToJPsiX = new TH1D("matchedMissingMassEpToJPsiX","Missing Mass in e+p -> e+ J/Psi + X from matched tracks; Missing Mass (GeV/c^{2})",100,0.,300.);
 
     // Define Kinematics Histograms
     TH1D* trueQ2 = new TH1D("trueQ^{2}","True Q^{2} Distribution; Q^{2} (GeV/c^{2})",100,0.,50.);
@@ -257,6 +272,18 @@ void DVMP_JPsi_Analysis()
 
     TH2D* recont_eXBABE_vs_truet = new TH2D("recont_eXBABE_vs_truet","Reconstructed t using the eXBABE Method vs True t; t_{MC} (GeV/c); t_{eXBABE} (GeV/c)",100,0.,2.,100,0.,2.);
 
+    TH1D* truey = new TH1D("truey","True y Distribution",100,0.,0.25);
+    TH1D* recony_DA = new TH1D("recony_DA","Reconstructed y Distribution using the DA method; y",100,0.,0.25);
+    TH1D* recony_JB = new TH1D("recony_JB","Reconstructed x Distribution using the JB method; y",100,0.,0.25);
+    TH1D* recony_e = new TH1D("recony_e","Reconstructed x Distribution using the electron method; y",100,0.,0.25);
+    TH1D* recony_sigma = new TH1D("recony_sigma","Reconstructed x Distribution using the sigma method; y",100,0.,0.25);
+
+    TH1D* deltay_DA = new TH1D("deltay_DA","Delta y (Reconstructed - True) using the DA Method; (y - y_{MC})/y_{MC}",100,-1.,1.);
+    TH1D* deltay_JB = new TH1D("deltay_JB","Delta y (Reconstructed - True) using the JB Method; (y - y_{MC})/y_{MC}",100,-1.,1.);
+    TH1D* deltay_e = new TH1D("deltay_e","Delta y (Reconstructed - True) using the electron Method; (y - y_{MC})/y_{MC}",100,-1.,1.);
+    TH1D* deltay_sigma = new TH1D("deltay_sigma","Delta y (Reconstructed - True) using the sigma Method; (y - y_{MC})/y_{MC}",100,-1.,1.);
+
+
     TH1D* truex = new TH1D("truex","True x Distribution",100,0.,0.25);
     TH1D* reconx_DA = new TH1D("reconx_DA","Reconstructed x Distribution using the DA method; x",100,0.,0.25);
     TH1D* reconx_JB = new TH1D("reconx_JB","Reconstructed x Distribution using the JB method; x",100,0.,0.25);
@@ -282,7 +309,7 @@ void DVMP_JPsi_Analysis()
     bool muonFound = false; // Flag to check if muon is found
     bool muonFinderReturn = false; // Return value from muon finder
     bool invMassError = false;
-    int cutEvents[4] = {0,0,0,0}; // Cut flow counter
+    int cutEvents[6] = {0,0,0,0,0,0}; // Cut flow counter
     int eventsPassed = 0; // Events passed counter
     int eventID = 0; // Event ID counter
 
@@ -294,6 +321,7 @@ void DVMP_JPsi_Analysis()
     int muonFinderIncorrectRate = 0; 
     int incorrectElectronIDrate = 0; 
     int incorrectMuonIDrate = 0;
+    int incorrectParentIDrate = 0;
 
     while(tree_reader.Next()) // Loop over events
     {
@@ -393,6 +421,8 @@ void DVMP_JPsi_Analysis()
                     protonEta->Fill(scatpMomT.PseudoRapidity());
                     protonMomHist->Fill(scatpMomT.Mag());
                     protonEtaMom->Fill(scatpMomT.PseudoRapidity(),scatpMomT.Mag());
+                    protonEMinusPzHist->Fill(partEng - scatpMomT.Z());
+                    protonPtHist->Fill(scatpMomT.Perp());
                 }
                 if(pdg == 13 && partCharge[i] == 1) // Look at mu+
                 {
@@ -412,15 +442,25 @@ void DVMP_JPsi_Analysis()
                 }
             }
         }
+        
+        if (scatEMomT.Mag() != 0. && scatpMomT.Mag() != 0.)
+        { 
+            electronProtonEMinusPzHist->Fill(scatE4MomT.E() + scatp4MomT.E() - (scatE4MomT.Pz() + scatp4MomT.Pz()));
+            electronProtonPtHist->Fill((scatEMomT + scatpMomT).Perp());
+        }
 
-        JPsiMomT = muPlusMomT + muMinusMomT; 
-        JPsi4MomT = muPlus4MomT + muMinus4MomT; 
+        if (muPlusMomT.Mag() != 0. && muMinusMomT.Mag() != 0.) 
+        { 
+            JPsiMomT = muPlusMomT + muMinusMomT; 
+            JPsi4MomT = muPlus4MomT + muMinus4MomT; 
 
-        invMassMuMu->Fill((muPlus4MomT + muMinus4MomT).M());
+            invMassMuMu->Fill((muPlus4MomT + muMinus4MomT).M());
 
-        JPsiEta->Fill(JPsiMomT.PseudoRapidity());
-        JPsiMomHist->Fill(JPsiMomT.Mag());
-        JPsiEtaMom->Fill(JPsiMomT.PseudoRapidity(),JPsiMomT.Mag());
+            JPsiEta->Fill(JPsiMomT.PseudoRapidity());
+            JPsiMomHist->Fill(JPsiMomT.Mag());
+            JPsiEtaMom->Fill(JPsiMomT.PseudoRapidity(),JPsiMomT.Mag());
+        }
+        
 
         // Search for the proton in the forward detectors
         for (unsigned int i = 0; i < RPEng.GetSize(); i++)
@@ -493,14 +533,18 @@ void DVMP_JPsi_Analysis()
                 else recoTrackTruePID[i] = TMath::Abs(partPdg[motherID]);
             }
         }
+        if ((recoTrackTruePID[0] == -1 || recoTrackTruePID[1] == -1 || recoTrackTruePID[2] == -1)) //|| (recoTrackTruePID[0] + recoTrackTruePID[1] + recoTrackTruePID[2] != 11 + 13 + 13))
+        {
+            incorrectParentIDrate++;
+            cutEvents[2]++;
+            continue;
+        }
 
         // Search for the electron reconstructed tracks using the electron finder
         for (unsigned int i = 0; i < trackEng.GetSize(); i++)
         {
-            if (trackCharge[i] != -1.0)
+            if (trackCharge[i] == 1.0)
             {
-                muPlusMomR = recoTrackMom[i];
-                muPlus4MomR = recoTrack4Mom[i];
                 recoTrackIndex[1] = i;
                 continue; // Only look at negative charged tracks
             }
@@ -527,95 +571,50 @@ void DVMP_JPsi_Analysis()
             if (recoTrackTruePID[recoTrackIndex[0]] != 11) electronFinderIncorrectRate++;
             if (recoTrackTruePID[recoTrackIndex[0]] == 11) electronFinderCorrectRate++;
         } 
-
-        if (electronFound == false) // If no electron found, search for the muon reconstructed tracks using the muon finder
+        else
         {
-            electronFinderInconclusiveRate++;
-            for (unsigned int i = 0; i < trackEng.GetSize(); i++)
+            
+            cutEvents[3]++;
+            continue;
+        }
+
+        for (unsigned int i = 0; i < trackEng.GetSize(); i++)
+        {
+            if (i == recoTrackIndex[0])
             {
-                if (trackCharge[i] != -1.0)
-                {
-                    continue; // Only look at negative charged tracks
-                }
-                //recoTrackMom = TVector3(trackMomX[i],trackMomY[i],trackMomZ[i]);
-                int simuID = simuAssoc[i];
-                muonFinderReturn =  IsMuon(recoTrackMom[i], simuID, EcalBarrelEng, EcalEndcapPEng, EcalEndcapNEng, HcalBarrelEng, HcalEndcapPEng, HcalEndcapNEng, 
-                                            simuAssocEcalBarrel, simuAssocEcalEndcapP, simuAssocEcalEndcapN, simuAssocHcalBarrel, simuAssocHcalEndcapP, simuAssocHcalEndcapN);
+                continue; // Ignore electron track
+            }
+            //recoTrackMom = TVector3(trackMomX[i],trackMomY[i],trackMomZ[i]);
+            int simuID = simuAssoc[i];
+            muonFinderReturn =  IsMuon(recoTrackMom[i], simuID, EcalBarrelEng, EcalEndcapPEng, EcalEndcapNEng, HcalBarrelEng, HcalEndcapPEng, HcalEndcapNEng, 
+                                        simuAssocEcalBarrel, simuAssocEcalEndcapP, simuAssocEcalEndcapN, simuAssocHcalBarrel, simuAssocHcalEndcapP, simuAssocHcalEndcapN);
                 
 
-                if (muonFinderReturn == true && muonFound == true) // If more than one muon found, skip event
-                {
-                    muonFound = false;
-                    electronFound = false;
-                    break;
-                }
-                else if (muonFinderReturn == true && muonFound == false) // If muon found and no muon has been found yet
-                {
-                    recoTrackIndex[2] = i;
-                    scatEMomR = recoTrackMom[3 - i - recoTrackIndex[1]];
-                    muonFound = true;
-                    electronFound = true;
-                }
+            if (muonFinderReturn == true && trackCharge[i] == 1.0)
+            {
+                recoTrackIndex[1] = i;
+            }
+            else if (muonFinderReturn == true && trackCharge[i] == -1.0) 
+            {
+                recoTrackIndex[2] = i;
             }
         }
 
-        if (muonFound == true)
+        if (recoTrackIndex[1] != -1 && recoTrackIndex[2] != -1)
         {
             if (recoTrackTruePID[recoTrackIndex[1]] != 13) muonFinderIncorrectRate++;
             if (recoTrackTruePID[recoTrackIndex[1]] == 13) muonFinderCorrectRate++;
+            if (recoTrackTruePID[recoTrackIndex[2]] != 13) muonFinderIncorrectRate++;
+            if (recoTrackTruePID[recoTrackIndex[2]] == 13) muonFinderCorrectRate++;
         }
-        if (muonFound == false) muonFinderInconclusiveRate++;
-
-        if (electronFound == true && TMath::Abs(3.0969 - (recoTrack4Mom[recoTrackIndex[1]] + recoTrack4Mom[recoTrackIndex[2]]).M()) > 0.5) invMassError = true;
-
-        if (electronFound == false || invMassError == true ) // If no electron found, use invariant mass to identify muon pairs from J/Psi decay
+        else
         {
-            if (recoTrackIndex[1] == -1) // If no mu+ found, cannot proceed
-            {
-                eventFail = true;
-                cutEvents[2]++;
-                continue;
-            }
-
-            int A,B;
-
-            if (recoTrackIndex[1] == 0)
-            {
-                A = 1;
-                B = 2;
-            }
-            else if (recoTrackIndex[1] == 1)
-            {
-                A = 0;
-                B = 2;
-            }
-            else // recoTrackIndex[1] == 2
-            {
-                A = 0;
-                B = 1;
-            }
-
-            double invMassA_diff = TMath::Abs(3.0969 - (recoTrack4Mom[recoTrackIndex[1]] + recoTrack4Mom[A]).M());
-            double invMassB_diff = TMath::Abs(3.0969 - (recoTrack4Mom[recoTrackIndex[1]] + recoTrack4Mom[B]).M());
             
-
-            if (invMassA_diff < invMassB_diff && invMassA_diff < 0.5) // JPsi mass window
-            {
-                recoTrackIndex[0] = B;
-                recoTrackIndex[2] = A;    
-            }
-            else if (invMassB_diff < invMassA_diff && invMassB_diff < 0.5) // JPsi mass window
-            {
-                recoTrackIndex[0] = A;
-                recoTrackIndex[2] = B;    
-            }
-            else
-            {
-                eventFail = true;
-            }
+            cutEvents[4]++;
+            continue;
         }
 
-        if (recoTrackIndex[0] != -1 && recoTrackIndex[1] != -1 && recoTrackIndex[2] != -1) // If all tracks identified, fill momentum vectors
+        if ((recoTrackIndex[0] != -1 && recoTrackIndex[1] != -1 && recoTrackIndex[2] != -1)) // If all tracks identified, fill momentum vectors
         {
             scatEMomR = recoTrackMom[recoTrackIndex[0]];
             recoTrack4Mom[recoTrackIndex[0]].SetPxPyPzE(trackMomX[recoTrackIndex[0]],trackMomY[recoTrackIndex[0]],trackMomZ[recoTrackIndex[0]], TMath::Sqrt(trackMomX[recoTrackIndex[0]]*trackMomX[recoTrackIndex[0]] + trackMomY[recoTrackIndex[0]]*trackMomY[recoTrackIndex[0]] + trackMomZ[recoTrackIndex[0]]*trackMomZ[recoTrackIndex[0]] + eMass*eMass));
@@ -629,66 +628,64 @@ void DVMP_JPsi_Analysis()
             if (TMath::Abs(recoTrackTruePID[recoTrackIndex[0]]) != 11)
             { 
                 incorrectElectronIDrate++;
-                /*
-                std::cout << "Incorrect Electron ID Detected!" << std::endl;
-                std::cout << "Event ID: " << eventID << std::endl;
-                std::cout << "Reconstructed Electron Track Index: " << recoTrackIndex[0] << std::endl;
-                std::cout << "Reconstructed Electron Momentum (Px, Py, Pz): (" << recoTrackMom[recoTrackIndex[0]].X() << ", " << recoTrackMom[recoTrackIndex[0]].Y() << ", " << recoTrackMom[recoTrackIndex[0]].Z() << ")" << std::endl;
-                std::cout << "True Electron simulated association ID: " << simuAssoc[recoTrackIndex[0]] << std::endl;
-                std::cout << "True Electron Momentum (Px, Py, Pz): (" << scatEMomT.X() << ", " << scatEMomT.Y() << ", " << scatEMomT.Z() << ")" << std::endl;
-                std::cout << "True Particle Pdg: " << recoTrackTruePID[recoTrackIndex[0]] << std::endl;
-                std::cout << "----------------------------------------" << std::endl;
-                */
             }
 
             if (TMath::Abs(recoTrackTruePID[recoTrackIndex[1]]) != 13)
             {
                 incorrectMuonIDrate++;
-                /*
-                std::cout << "Incorrect Muon ID Detected!" << std::endl;
-                std::cout << "Event ID: " << eventID << std::endl;
-                std::cout << "Reconstructed Mu+ Track Index: " << recoTrackIndex[1] << std::endl;
-                std::cout << "Reconstructed Mu+ Momentum (Px, Py, Pz): (" << recoTrackMom[recoTrackIndex[1]].X() << ", " << recoTrackMom[recoTrackIndex[1]].Y() << ", " << recoTrackMom[recoTrackIndex[1]].Z() << ")" << std::endl;
-                std::cout << "True Muon simulated association ID: " << simuAssoc[recoTrackIndex[1]] << std::endl;
-                std::cout << "True Mu+ Momentum (Px, Py, Pz): (" << muPlusMomT.X() << ", " << muPlusMomT.Y() << ", " << muPlusMomT.Z() << ")" << std::endl;
-                std::cout << "True Particle Pdg: " << recoTrackTruePID[recoTrackIndex[1]] << std::endl;
-                std::cout << "" << std::endl;
-                std::cout << "J/Psi Invariant Mass from Reconstructed Muon Pair: " << (recoTrack4Mom[recoTrackIndex[1]] + recoTrack4Mom[recoTrackIndex[2]]).M() << " GeV" << std::endl;
-                std::cout << "J/Psi Invariant Mass from True Muon Pair: " << (muPlus4MomT + muMinus4MomT).M() << " GeV" << std::endl;
-                std::cout << "----------------------------------------" << std::endl;
-                */
-
             }
 
             if (TMath::Abs(recoTrackTruePID[recoTrackIndex[2]]) != 13)
             {
                 incorrectMuonIDrate++;
-                /*
-                std::cout << "Incorrect Muon ID Detected!" << std::endl;
-                std::cout << "Event ID: " << eventID << std::endl;
-                std::cout << "Reconstructed Mu- Track Index: " << recoTrackIndex[2] << std::endl;
-                std::cout << "Reconstructed Mu- Momentum (Px, Py, Pz): (" << recoTrackMom[recoTrackIndex[2]].X() << ", " << recoTrackMom[recoTrackIndex[2]].Y() << ", " << recoTrackMom[recoTrackIndex[2]].Z() << ")" << std::endl;
-                std::cout << "True Muon simulated association ID: " << simuAssoc[recoTrackIndex[2]] << std::endl;
-                std::cout << "True Mu- Momentum (Px, Py, Pz): (" << muMinusMomT.X() << ", " << muMinusMomT.Y() << ", " << muMinusMomT.Z() << ")" << std::endl;
-                std::cout << "True Particle Pdg: " << recoTrackTruePID[recoTrackIndex[2]] << std::endl;
-                std::cout << "" << std::endl;
-                std::cout << "J/Psi Invariant Mass from Reconstructed Muon Pair: " << (recoTrack4Mom[recoTrackIndex[1]] + recoTrack4Mom[recoTrackIndex[2]]).M() << " GeV" << std::endl;
-                std::cout << "J/Psi Invariant Mass from True Muon Pair: " << (muPlus4MomT + muMinus4MomT).M() << " GeV" << std::endl;
-                std::cout << "----------------------------------------" << std::endl;
-                */
             } 
 
-
         }
-        else if ((recoTrackIndex[0] != -1 || recoTrackIndex[1] != -1 || recoTrackIndex[2] != -1) || eventFail == true) // If no electron found, skip event
+        else
+        {
+            cutEvents[4]++;
+            continue;
+        }
+
+        JPsiMomR = muPlusMomR + muMinusMomR; 
+        JPsi4MomR = muPlus4MomR + muMinus4MomR;
+
+
+        if (JPsi4MomR.M() < 2.5 || JPsi4MomR.M() > 4.0) // If invariant mass of muon pair is outside J/Psi mass window, skip event
         { 
-            cutEvents[3]++;
+            cutEvents[5]++;
+            continue;
+        }
+
+        ROOT::Math::Boost boostToJPsiRest(-JPsi4MomR.X()/JPsi4MomR.E(), -JPsi4MomR.Y()/JPsi4MomR.E(), -JPsi4MomR.Z()/JPsi4MomR.E());
+
+        muPlus4MomR_Boosted = boostToJPsiRest(muPlus4MomR);
+        muMinus4MomR_Boosted = boostToJPsiRest(muMinus4MomR);
+
+        // Convert the boosted 4-vectors' spatial components to TVector3 and compute the angle
+        TVector3 muPlusBoostVec(muPlus4MomR_Boosted.X(), muPlus4MomR_Boosted.Y(), muPlus4MomR_Boosted.Z());
+        TVector3 muMinusBoostVec(muMinus4MomR_Boosted.X(), muMinus4MomR_Boosted.Y(), muMinus4MomR_Boosted.Z());
+        double muonAngle = muPlusBoostVec.Angle(muMinusBoostVec);
+        muonScatterAngle->Fill(muonAngle);
+
+        if (TMath::Abs(TMath::Pi() - muonAngle) > 0.5) // If the angle between the two muons in the J/Psi rest frame is too large, skip event
+        { 
+            cutEvents[5]++;
+            continue;
+        }
+
+        double missingMass = (beamE4Mom + beamp4Mom - scatE4MomR - scatp4MomR - muPlus4MomR - muMinus4MomR).M();
+        matchedMissingMassEpToJPsiX->Fill(missingMass);
+        if (TMath::Abs(missingMass) > 2.0) // If missing mass is too large, skip event
+        { 
+            cutEvents[5]++;
             continue; 
         }
+        
+        
+        eventsPassed++;
 
         // Fill plots
-
-        eventsPassed++;
 
         matchedElectronEta->Fill(scatEMomR.PseudoRapidity());
         electronEff->Fill(scatEMomR.PseudoRapidity());
@@ -706,11 +703,12 @@ void DVMP_JPsi_Analysis()
         matchedProtonMomHist->Fill(scatpMomR.Mag());
         protonMomEff->Fill(scatpMomR.Mag());
         matchedProtonEtaMom->Fill(scatpMomR.PseudoRapidity(),scatpMomR.Mag());
+        matchedProtonEMinusPzHist->Fill(scatp4MomR.E() - scatpMomR.Z());
+        matchedProtonPtHist->Fill(scatpMomR.Perp());
         float deltaEta_proton = scatpMomT.PseudoRapidity() - scatpMomR.PseudoRapidity();
         float deltaPhi_proton = TVector2::Phi_mpi_pi(scatpMomT.Phi() - scatpMomR.Phi());
         float deltaR_proton = TMath::Sqrt(deltaEta_proton*deltaEta_proton + deltaPhi_proton*deltaPhi_proton);
         matchedProtonTrackDeltaR->Fill(deltaR_proton);
-      
         
         matchedMuonEta->Fill(muPlusMomR.PseudoRapidity());
         muonEff->Fill(muPlusMomR.PseudoRapidity());
@@ -722,6 +720,8 @@ void DVMP_JPsi_Analysis()
         float deltaR_muPlus = TMath::Sqrt(deltaEta_muPlus*deltaEta_muPlus + deltaPhi_muPlus*deltaPhi_muPlus);
         matchedMuonTrackDeltaR->Fill(deltaR_muPlus);
         
+        matchedElectronProtonEMinusPzHist->Fill(scatE4MomR.E() + scatp4MomR.E() - (scatE4MomR.Pz() + scatp4MomR.Pz()));
+        matchedElectronProtonPtHist->Fill((scatEMomR + scatpMomR).Perp());
         
         matchedMuonEta->Fill(muMinusMomR.PseudoRapidity());
         muonEff->Fill(muMinusMomR.PseudoRapidity());
@@ -732,10 +732,6 @@ void DVMP_JPsi_Analysis()
         float deltaPhi_muMinus = TVector2::Phi_mpi_pi(muMinusMomT.Phi() - muMinusMomR.Phi());
         float deltaR_muMinus = TMath::Sqrt(deltaEta_muMinus*deltaEta_muMinus + deltaPhi_muMinus*deltaPhi_muMinus);
         matchedMuonTrackDeltaR->Fill(deltaR_muMinus);
-
-        
-        JPsiMomR = muPlusMomR + muMinusMomR; 
-        JPsi4MomR = muPlus4MomR + muMinus4MomR;
 
         matchedMuMuInvMass->Fill(JPsi4MomR.M()); 
 
@@ -817,6 +813,16 @@ void DVMP_JPsi_Analysis()
 
         recont_eXBABE_vs_truet->Fill(t_truth, t_eXBABE);
 
+        truey->Fill(y_truth);
+        recony_e->Fill(y_e);
+        recony_JB->Fill(y_JB);
+        recony_DA->Fill(y_DA);
+        recony_sigma->Fill(y_sigma);
+        deltay_e->Fill((y_e - y_truth)/y_truth);
+        deltay_JB->Fill((y_JB - y_truth)/y_truth);
+        deltay_DA->Fill((y_DA - y_truth)/y_truth);
+        deltay_sigma->Fill((y_sigma - y_truth)/y_truth);
+
         truex->Fill(x_truth);
         reconx_e->Fill(x_e);
         reconx_JB->Fill(x_JB);
@@ -832,10 +838,14 @@ void DVMP_JPsi_Analysis()
     std::cout << "Event Processing Complete" << std::endl;
     std::cout << "Total Events Processed: " << eventID << std::endl;
     std::cout << "Cut Flow: " << std::endl;
-    std::cout << "  - Events with 3 tracks: " << eventID - cutEvents[0] << std::endl;
+    std::cout << "  - Events with 3 tracks and sum charge of -1: " << eventID - cutEvents[0] << std::endl;
     std::cout << "  - Events with identified proton: " << eventID - cutEvents[0] - cutEvents[1] << std::endl;
-    std::cout << "  - Events with identified muon+: " << eventID - cutEvents[0] - cutEvents[1] - cutEvents[2] << std::endl;
-    std::cout << "  - Events with identified electron/muon pair: " << eventsPassed << std::endl;
+    std::cout << "  - Events with correct parents: " << eventID - cutEvents[0] - cutEvents[1] - cutEvents[2] << std::endl;
+    std::cout << "  - Events with identified electron: " << eventID - cutEvents[0] - cutEvents[1] - cutEvents[2] - cutEvents[3] << std::endl;
+    std::cout << "  - Events with identified muon pair: " << eventID - cutEvents[0] - cutEvents[1] - cutEvents[2] - cutEvents[3] - cutEvents[4] << std::endl;
+    std::cout << "  - Events with J/Psi candidate from muon pair: " << eventID - cutEvents[0] - cutEvents[1] - cutEvents[2] - cutEvents[3] - cutEvents[4] - cutEvents[5] << std::endl;
+    std::cout << "  - Total Events Passing All Cuts: " << eventsPassed << std::endl;
+    std::cout << "Parent ID Incorrect Rate: " << incorrectParentIDrate << std::endl;
     std::cout << "Electron Finder Correct Rate: " << electronFinderCorrectRate << ", Inconclusive Rate: " << electronFinderInconclusiveRate << ", Fail Rate: " << electronFinderIncorrectRate << std::endl;
     std::cout << "Muon Finder Correct Rate: " << muonFinderCorrectRate << ", Inconclusive Rate: " << muonFinderInconclusiveRate << ", Fail Rate: " << muonFinderIncorrectRate << std::endl;
     std::cout << "Incorrectly identified electron tracks: " << incorrectElectronIDrate << std::endl;
@@ -874,8 +884,19 @@ void DVMP_JPsi_Analysis()
     matchedProtonMomHist->Write();
     protonMomEff->Write();
     protonEtaMom->Write();
+    protonEMinusPzHist->Write();
+    matchedProtonEMinusPzHist->Write();
+    protonPtHist->Write();
+    matchedProtonPtHist->Write();
     matchedProtonEtaMom->Write();
     matchedProtonTrackDeltaR->Write();
+    ofile->cd("..");
+    ofile->mkdir("electronProton");
+    ofile->cd("electronProton");
+    electronProtonEMinusPzHist->Write();
+    matchedElectronProtonEMinusPzHist->Write();
+    electronProtonPtHist->Write();
+    matchedElectronProtonPtHist->Write();
     ofile->cd("..");
     ofile->mkdir("muons");
     ofile->cd("muons");
@@ -903,8 +924,10 @@ void DVMP_JPsi_Analysis()
     ofile->cd("..");
     ofile->mkdir("invariantMass");
     ofile->cd("invariantMass");
+    muonScatterAngle->Write();
     invMassMuMu->Write();
     matchedMuMuInvMass->Write();
+    matchedMissingMassEpToJPsiX->Write();
     ofile->cd("..");
     ofile->mkdir("kinematics");
     ofile->cd("kinematics");
@@ -920,6 +943,11 @@ void DVMP_JPsi_Analysis()
     recont_eX->Write();
     recont_BABE->Write();
     recont_eXBABE_vs_truet->Write();
+    truey->Write();
+    recony_e->Write();
+    recony_JB->Write();
+    recony_DA->Write();
+    recony_sigma->Write();
     truex->Write();
     reconx_e->Write();
     reconx_JB->Write();
@@ -936,6 +964,10 @@ void DVMP_JPsi_Analysis()
     deltat_eXPT->Write();
     deltat_eX->Write();
     deltat_BABE->Write();
+    deltay_e->Write();
+    deltay_JB->Write();
+    deltay_DA->Write();
+    deltay_sigma->Write();
     deltax_e->Write();
     deltax_JB->Write();
     deltax_DA->Write();

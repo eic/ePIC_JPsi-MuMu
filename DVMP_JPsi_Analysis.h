@@ -30,6 +30,9 @@ inline ROOT::Math::PxPyPzEVector muMinus4MomT;
 inline TVector3 muMinusMomR;
 inline ROOT::Math::PxPyPzEVector muMinus4MomR;
 
+inline ROOT::Math::PxPyPzEVector muPlus4MomR_Boosted;
+inline ROOT::Math::PxPyPzEVector muMinus4MomR_Boosted;
+
 inline TVector3 JPsiMomT;
 inline ROOT::Math::PxPyPzEVector JPsi4MomT;
 inline TVector3 JPsiMomR;

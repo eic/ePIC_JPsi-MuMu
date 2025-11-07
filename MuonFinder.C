@@ -96,8 +96,38 @@ bool IsMuon(TVector3 trackMom, int simuID,
     }
 
 
-    bool ECalEpCut = (ECalEnergy/trackMom.Mag() < 0.4 && ECalEnergy/trackMom.Mag() >= 0.);
-    bool HCalEpCut = (HCalEnergy/trackMom.Mag() < 1 && HCalEnergy/trackMom.Mag() >= 0.05);
+    bool ECalEpCut; // = (ECalEnergy/trackMom.Mag() < 0.4 && ECalEnergy/trackMom.Mag() >= 0.);
+    bool HCalEpCut;
+
+    if (trackMom.Mag() > 10.) // Different cuts for low-momentum tracks
+    {
+        ECalEpCut = (ECalEnergy/trackMom.Mag() <= 0.1 && ECalEnergy/trackMom.Mag() >= 0.);
+    }
+    else if (trackMom.Mag() <= 10. && trackMom.Mag() > 0.)
+    {
+        double cutValueEcal = -0.03*trackMom.Mag() + 0.4;
+        ECalEpCut = (ECalEnergy/trackMom.Mag() >= 0. && ECalEnergy/trackMom.Mag() <= cutValueEcal);
+    }
+    else
+    {
+        ECalEpCut = false;
+    }
+
+    if (trackMom.Mag() > 5.) // Different cuts for low-momentum tracks
+    {
+        HCalEpCut = (HCalEnergy/trackMom.Mag() <= 0.5 && HCalEnergy/trackMom.Mag() >= 0.05);
+    }
+    else if (trackMom.Mag() <= 5. && trackMom.Mag() > 0.)
+    {
+        double cutValueHcal = -0.09*trackMom.Mag() + 0.5;
+        HCalEpCut = (HCalEnergy/trackMom.Mag() >= cutValueHcal);
+    }
+    else
+    {
+        HCalEpCut = false;
+    }
+
+    
     bool EcalHitCut = (ECalHits < 6);
     bool HcalHitCut = (HCalHits < 9);
 
