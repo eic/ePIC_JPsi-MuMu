@@ -46,12 +46,12 @@ void epPlots()
 {
 
     //TString infile="../eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x130ep_Pruned.root";
-    TString infile="reconOut/mu-pi-ka-e-p_20GeV_reconOut.root";
+    TString infile="reconOut/mu-pi_20GeV_reconOut.root";
 
     double protonEnergy = 130; 
 
     //std::string outfilename = "outputs/JPsiMuMu_10ifb_10x130ep_epPlots.root";
-    std::string outfilename = "outputs/mu-pi-ka-e-p_epPlots.root";
+    std::string outfilename = "outputs/mu-pi_epPlots.root";
 
     // Set output file for the histograms
     TFile *ofile = TFile::Open(outfilename.c_str(),"RECREATE");
@@ -146,11 +146,20 @@ void epPlots()
     TH1D *muonRecEta = new TH1D("muonEta","Muon Pseudo-rapidity; eta; Counts",100,-5.,5.);
 
     // Momentum plots by particle
-    TH1D *protonRecP = new TH1D("protonP","Proton Momentum; p [GeV/c]; Counts",100,0.,25.);
-    TH1D *electronRecP = new TH1D("electronP","Electron Momentum; p [GeV/c]; Counts",100,0.,25.);
-    TH1D *pionRecP = new TH1D("pionP","Pion Momentum; p [GeV/c]; Counts",100,0.,25.);
-    TH1D *kaonRecP = new TH1D("kaonP","Kaon Momentum; p [GeV/c]; Counts",100,0.,25.);
-    TH1D *muonRecP = new TH1D("muonP","Muon Momentum; p [GeV/c]; Counts",100,0.,25.);
+    TH1D *allParticlesTrueP = new TH1D("allParticlesTrueP","Momentum of all Generated Particles; p [GeV/c]; Counts",100,0.,25.);
+    TH1D *allParticlesRecP_PC = new TH1D("allParticlesRecP_PC","Momentum of all Reconstructed Particles post cuts; p [GeV/c]; Counts",100,0.,25.);
+
+    TH1D *protonRecP = new TH1D("protonP","Reconstructed Proton Momentum; p [GeV/c]; Counts",100,0.,25.);
+    TH1D *electronRecP = new TH1D("electronP","Reconstructed Electron Momentum; p [GeV/c]; Counts",100,0.,25.);
+    TH1D *pionRecP = new TH1D("pionP","Reconstructed Pion Momentum; p [GeV/c]; Counts",100,0.,25.);
+    TH1D *kaonRecP = new TH1D("kaonP","Reconstructed Kaon Momentum; p [GeV/c]; Counts",100,0.,25.);
+    TH1D *muonTrueP = new TH1D("muonTrueP","Momentum of Generated Muons;Momentum (GeV/c)",100,0.,25.);
+    TH1D *muonRecP = new TH1D("muonP","Reconstructed Muon Momentum; p [GeV/c]; Counts",100,0.,25.);
+    
+    TH1D *muonMomEff = new TH1D("muonMomEff","Efficency;Momentum (GeV/c)",100,0.,25.);
+    TH1D *muonMomPur = new TH1D("muonMomPur","Purity;Momentum (GeV/c)",100,0.,25.);
+
+    TH1D *muonRecMinusTrueP = new TH1D("muonRecMinusTrueP","Muon Momentum Difference; p [GeV/c]; Counts",100,-25.,25.);
 
     // Ecal ep Plots by particle
     TH2D *protonEpTrueEcal = new TH2D("protonEpTrueEcal","Ecal Energy vs Track Momentum for Protons; p;  E/p",100,0.,25.,200,0.,2.0);
@@ -223,17 +232,6 @@ void epPlots()
 
     TH1D *pionPostCutP = new TH1D("pionPCP","Pion Momentum post cuts; p [GeV/c]; Counts",100,0.,25.);
     TH1D *muonPostCutP = new TH1D("muonPCP","Muon Momentum post cuts; p [GeV/c]; Counts",100,0.,25.);
-
-    // Purity and Efficiency Counters
-
-    double momentumBins[20] = {0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13.5, 14.5, 15.5, 16.5, 17.5, 18.5, 19.5};
-    double muonTrueCounts[20] = {0};
-    double muonRecCounts[20] = {0};
-    double totalParticleTrueCounts[20] = {0};
-    double totalParticleRecCounts[20] = {0};
-    double muonPurityTrue[20] = {0};
-    double muonPurityRec[20] = {0};
-    double muonEfficiency[20] = {0};
 
     // Define 3 and 4-momentum vectors for particles
 
@@ -353,15 +351,15 @@ void epPlots()
             }
 
             if (partEta < -4 || partEta > 4) continue;
-            if (TVector3(partMomX[i],partMomY[i],partMomZ[i]).Mag() < 0.05) continue;
-                
-            totalParticleTrueCounts[int((TVector3(partMomX[i],partMomY[i],partMomZ[i]).Mag()-0.5))] += 1;
+            if (TVector3(partMomX[i],partMomY[i],partMomZ[i]).Mag() < 0.05 || TVector3(partMomX[i],partMomY[i],partMomZ[i]).Mag() > 20) continue;
+          
+            allParticlesTrueP->Fill(TVector3(partMomX[i],partMomY[i],partMomZ[i]).Mag());
 
             switch (TMath::Abs(partPdg[i]))
             {
                 case 13:
                     trueParticles[0] += 1.;
-                    muonTrueCounts[int((TVector3(partMomX[i],partMomY[i],partMomZ[i]).Mag()-0.5))] += 1;
+                    muonTrueP->Fill(TVector3(partMomX[i],partMomY[i],partMomZ[i]).Mag());
                     break;
                 case 211:
                     trueParticles[1] += 1.;
@@ -391,7 +389,7 @@ void epPlots()
             ROOT::Math::PxPyPzEVector reco4Mom(recoMomX[i],recoMomY[i],recoMomZ[i], trackEng[i]);
 
             if (recoMom.Eta() < -4 || recoMom.Eta() > 4) continue;
-            if (recoMom.Mag() < 0.05) continue;
+            if (recoMom.Mag() < 0.05 || recoMom.Mag() > 20.0) continue;
 
             if (i >= simuAssoc.GetSize() || simuAssoc[i] >= partPdg.GetSize()) continue;
 
@@ -471,6 +469,7 @@ void epPlots()
             TVector3 trueMom(partMomX[simuAssoc[i]],partMomY[simuAssoc[i]],partMomZ[simuAssoc[i]]);
             ROOT::Math::PxPyPzEVector true4Mom(partMomX[simuAssoc[i]],partMomY[simuAssoc[i]],partMomZ[simuAssoc[i]], partEng);
             double trueMass = std::sqrt( trueMom.Mag2() - partEng*partEng);
+
 
             //if (HCalEnergy/trueMom.Mag() > 2.0) std::cout << "HCal Ratio: " <<  HCalEnergy/trueMom.Mag() << std::endl;
 
@@ -795,28 +794,34 @@ void epPlots()
                         {
                             clusterSizePID->Fill(TMath::Abs(partPdg[simuAssoc[i]]));
                             totalParticles[4] += 1.;
-                            totalParticleRecCounts[int((TVector3(recoMom[i],recoMom[i],recoMom[i]).Mag()-0.5))] += 1;
                             switch (TMath::Abs(partPdg[simuAssoc[i]]))
                             {
                                 case 13:
                                     muons[4] += 1.;
                                     muonPostCutEta->Fill(recoMom.PseudoRapidity());
                                     muonPostCutP->Fill(recoMom.Mag());
-                                    muonRecCounts[int((TVector3(recoMom[i],recoMom[i],recoMom[i]).Mag()-0.5))] += 1;
+                                    muonRecMinusTrueP->Fill(recoMom.Mag()-trueMom.Mag());
+                                    muonMomEff->Fill(recoMom.Mag());
+                                    muonMomPur->Fill(recoMom.Mag());
+                                    allParticlesRecP_PC->Fill(recoMom.Mag());
                                     break;
                                 case 211:
                                     pions[4] += 1.;
                                     pionPostCutEta->Fill(recoMom.PseudoRapidity());
                                     pionPostCutP->Fill(recoMom.Mag());
+                                    allParticlesRecP_PC->Fill(recoMom.Mag());
                                     break;
                                 case 321:
                                     kaons[4] += 1.;
+                                    allParticlesRecP_PC->Fill(recoMom.Mag());
                                     break;
                                 case 2212:
                                     protons[4] += 1.;
+                                    allParticlesRecP_PC->Fill(recoMom.Mag());
                                     break;
                                 case 11:
                                     electrons[4] += 1.;
+                                    allParticlesRecP_PC->Fill(recoMom.Mag());
                                     break;
                                 default:
                                     break;
@@ -1113,39 +1118,16 @@ void epPlots()
     clusterSizePID->Draw();
     cPIDcuts->Update();
 
-    for (size_t i = 0; i < 20; i++)
-    {
-        if (totalParticleTrueCounts[i] == 0) totalParticleTrueCounts[i] = 1;
-        if (totalParticleRecCounts[i] == 0) totalParticleRecCounts[i] = 1; 
-        muonPurityTrue[i] = muonTrueCounts[i]/(totalParticleTrueCounts[i]/2.4);   
-        muonPurityRec[i] = muonRecCounts[i]/totalParticleRecCounts[i];
-        muonEfficiency[i] = muonRecCounts[i]/muonTrueCounts[i];
-    }
 
-    TGraph *muonEff = new TGraph(20, momentumBins, muonEfficiency);
-    muonEff->SetTitle("Muon Efficiency vs Momentum;Momentum (GeV/c);Efficiency");
-    TGraph *muonPurR = new TGraph(20, momentumBins, muonPurityRec);
-    muonPurR->SetTitle("Muon Purity vs Momentum;Momentum (GeV/c);Purity");
-    TGraph *muonPurT = new TGraph(20, momentumBins, muonPurityTrue);
-    muonPurT->SetTitle("Muon Purity vs Momentum;Momentum (GeV/c);Purity");
+    muonMomEff->Divide(muonTrueP);
+    muonMomPur->Divide(allParticlesRecP_PC);
 
     TCanvas *cMuonEffPur = new TCanvas("cMuonEffPur","cMuonEffPur",1100,800);
-    cMuonEffPur->Divide(2,2);
+    cMuonEffPur->Divide(1,2);
     cMuonEffPur->cd(1);
-    muonEff->SetLineColor(kBlue);
-    muonEff->SetMarkerColor(kBlue);
-    muonEff->SetMarkerStyle(20);
-    muonEff->Draw("APL");
+    muonMomEff->Draw("");
     cMuonEffPur->cd(2);
-    muonPurT->SetLineColor(kRed);
-    muonPurT->SetMarkerColor(kRed);
-    muonPurT->SetMarkerStyle(20);
-    muonPurT->Draw("APL");
-    cMuonEffPur->cd(3);
-    muonPurR->SetLineColor(kGreen+2);
-    muonPurR->SetMarkerColor(kGreen+2);
-    muonPurR->SetMarkerStyle(20);
-    muonPurR->Draw("APL");
+    muonMomPur->Draw("");
     cMuonEffPur->Update();
 
 
@@ -1266,6 +1248,8 @@ void epPlots()
     cPostCuts->cd(4);
     pionPostCutP->SetFillColor(colours[1]);
     pionPostCutP->Draw();
+    cPostCuts->cd(5);
+    muonRecMinusTrueP->Draw();
     cPostCuts->Update();
 
     ofile->cd();
@@ -1284,6 +1268,7 @@ void epPlots()
     pionRecP->Write();
     kaonRecP->Write();
     muonRecP->Write();
+    muonTrueP->Write();
     ofile->cd("..");
     ofile->mkdir("trueEcalEp");
     ofile->cd("trueEcalEp");
@@ -1372,11 +1357,11 @@ void epPlots()
     ofile->cd("postCuts");
     muonPostCutEta->Write();
     muonPostCutP->Write();
+    muonRecMinusTrueP->Write();
     pionPostCutEta->Write();
     pionPostCutP->Write();
-    muonEff->Write("muonEfficiency");
-    muonPurT->Write("muonPurityTrue");
-    muonPurR->Write("muonPurityRec");
+    muonMomEff->Write("muonEfficiency");
+    muonMomPur->Write("muonPurity");
     ofile->cd("..");
 
 

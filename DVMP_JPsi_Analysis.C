@@ -54,8 +54,8 @@ void DVMP_JPsi_Analysis()
     gROOT->ProcessLine("SetePICStyle()");
     //gStyle->SetOptStat(0);
 
-    //TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x130ep_Pruned.root";
-    TString infile="dis_background/DIS_Q2_1_10_10x130ep_Pruned.root";
+    TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x130ep_Pruned.root";
+    //TString infile="dis_background/DIS_Q2_1_10_10x130ep_Pruned.root";
     
     std::string filename = infile.Data();
     std::string beam_config;
@@ -83,8 +83,8 @@ void DVMP_JPsi_Analysis()
     std::cout << "Proton energy: " << protonEnergy << std::endl;
 
     int lumi_int = static_cast<int>(lumi);
-    //std::string outfilename = "outputs/DVMP_JPsi_AnalysisOutput_" + std::to_string(lumi_int) + "ifb_" + beam_config + ".root";
-    std::string outfilename = "outputs/DIS_Q2_1_10_AnalysisOutput_" + beam_config + ".root";
+    std::string outfilename = "outputs/DVMP_JPsi_AnalysisOutput_" + std::to_string(lumi_int) + "ifb_" + beam_config + ".root";
+    //std::string outfilename = "outputs/DIS_Q2_1_10_AnalysisOutput_" + beam_config + ".root";
 
     // Set output file for the histograms
     TFile *ofile = TFile::Open(outfilename.c_str(),"RECREATE");
@@ -272,17 +272,16 @@ void DVMP_JPsi_Analysis()
 
     TH2D* recont_eXBABE_vs_truet = new TH2D("recont_eXBABE_vs_truet","Reconstructed t using the eXBABE Method vs True t; t_{MC} (GeV/c); t_{eXBABE} (GeV/c)",100,0.,2.,100,0.,2.);
 
-    TH1D* truey = new TH1D("truey","True y Distribution",100,0.,0.25);
-    TH1D* recony_DA = new TH1D("recony_DA","Reconstructed y Distribution using the DA method; y",100,0.,0.25);
-    TH1D* recony_JB = new TH1D("recony_JB","Reconstructed x Distribution using the JB method; y",100,0.,0.25);
-    TH1D* recony_e = new TH1D("recony_e","Reconstructed x Distribution using the electron method; y",100,0.,0.25);
-    TH1D* recony_sigma = new TH1D("recony_sigma","Reconstructed x Distribution using the sigma method; y",100,0.,0.25);
+    TH1D* truey = new TH1D("truey","True y Distribution",100,0.,1.0);
+    TH1D* recony_DA = new TH1D("recony_DA","Reconstructed y Distribution using the DA method; y",100,0.,1.0);
+    TH1D* recony_JB = new TH1D("recony_JB","Reconstructed x Distribution using the JB method; y",100,0.,1.0);
+    TH1D* recony_e = new TH1D("recony_e","Reconstructed x Distribution using the electron method; y",100,0.,1.0);
+    TH1D* recony_sigma = new TH1D("recony_sigma","Reconstructed x Distribution using the sigma method; y",100,0.,1.0);
 
     TH1D* deltay_DA = new TH1D("deltay_DA","Delta y (Reconstructed - True) using the DA Method; (y - y_{MC})/y_{MC}",100,-1.,1.);
     TH1D* deltay_JB = new TH1D("deltay_JB","Delta y (Reconstructed - True) using the JB Method; (y - y_{MC})/y_{MC}",100,-1.,1.);
     TH1D* deltay_e = new TH1D("deltay_e","Delta y (Reconstructed - True) using the electron Method; (y - y_{MC})/y_{MC}",100,-1.,1.);
     TH1D* deltay_sigma = new TH1D("deltay_sigma","Delta y (Reconstructed - True) using the sigma Method; (y - y_{MC})/y_{MC}",100,-1.,1.);
-
 
     TH1D* truex = new TH1D("truex","True x Distribution",100,0.,0.25);
     TH1D* reconx_DA = new TH1D("reconx_DA","Reconstructed x Distribution using the DA method; x",100,0.,0.25);
@@ -767,22 +766,21 @@ void DVMP_JPsi_Analysis()
 
         y_e =(beamp4Mom.Dot(beamE4Mom - scatE4MomR))/(beamE4Mom.Dot(beamE4Mom));
         Q2_e = -(beamE4Mom - scatE4MomR).mag2();
-        x_e = Q2_e/(4*beamE4Mom.E()*beamE4Mom.E()*y_e);
+        x_e = Q2_e/(4*beamE4Mom.E()*beamp4Mom.E()*y_e);
 
         y_JB = delta_h/(2*beamE4Mom.E());
         Q2_JB = pt2_h/(1-y_JB);
-        x_JB = Q2_JB/(4*beamE4Mom.E()*beamE4Mom.E()*y_JB);
+        x_JB = Q2_JB/(4*beamE4Mom.E()*beamp4Mom.E()*y_JB);
 
         y_DA = (alpha_h)/(alpha_e + alpha_h);
         Q2_DA = (4*beamE4Mom.E()*beamE4Mom.E())/(alpha_e*(alpha_e +alpha_h));
-        x_DA = Q2_DA/(4*beamE4Mom.E()*beamE4Mom.E()*y_DA);
+        x_DA = Q2_DA/(4*beamE4Mom.E()*beamp4Mom.E()*y_DA);
         
         y_sigma = delta_h/(delta_h + (scatE4MomR.E()*(1-cos(scatE4MomR.Theta()))));
         Q2_sigma = (pow(scatE4MomR.E(),2)*pow(sin(scatE4MomR.Theta()),2))/(1-y_sigma);
-        x_sigma = Q2_sigma/(4*beamE4Mom.E()*beamE4Mom.E()*y_sigma);
+        x_sigma = Q2_sigma/(4*beamE4Mom.E()*beamp4Mom.E()*y_sigma);
 
         t_BABE = -1*((beamp4Mom - scatp4MomR).mag2());
-
         t_eX = -1*(((beamE4Mom - scatE4MomR) - JPsi4MomR).mag2());
         t_eXPT = (vec_t_XPT.Perp2()); // Rotate vetors prior to getting perpendicular component
         t_eXBABE = -1*((beamp4Mom - scatp4MomR_corr).mag2());
@@ -833,6 +831,38 @@ void DVMP_JPsi_Analysis()
         deltax_DA->Fill((x_DA - x_truth)/x_truth);
         deltax_sigma->Fill((x_sigma - x_truth)/x_truth);
 
+
+        if (1 <= Q2_truth && Q2_truth <= 50) // Check if Q2 is in the range of interest
+        {
+          if (0.0016 <= x_truth && x_truth < 0.0025) // Check if xbjk is in the range of interest
+          {
+            truet_XbjkA->Fill(t_truth);
+          }
+          else if (0.016 <= x_truth && x_truth < 0.025)
+          {
+            truet_XbjkB->Fill(t_truth);
+          }
+          else if (0.16 <= x_truth && x_truth < 0.25)
+          {
+            truet_XbjkC->Fill(t_truth);
+          }
+        }
+
+        if (1 <= Q2_DA && Q2_DA <= 50) // Check if Q2 is in the range of interest
+        {
+          if (0.0016 <= x_DA && x_DA < 0.0025) // Check if xbjk is in the range of interest
+          {
+            recont_XbjkA->Fill(t_eXBABE);
+          }
+          else if (0.016 <= x_DA && x_DA < 0.025)
+          {
+            recont_XbjkB->Fill(t_eXBABE);
+          }
+          else if (0.16 <= x_DA && x_DA < 0.25)
+          {
+            recont_XbjkC->Fill(t_eXBABE);
+          }
+        }
     } 
 
     std::cout << "Event Processing Complete" << std::endl;
@@ -972,6 +1002,15 @@ void DVMP_JPsi_Analysis()
     deltax_JB->Write();
     deltax_DA->Write();
     deltax_sigma->Write();
+    ofile->cd("..");
+    ofile->mkdir("tDistributionsByXbjk");
+    ofile->cd("tDistributionsByXbjk");
+    truet_XbjkA->Write();
+    truet_XbjkB->Write();
+    truet_XbjkC->Write();
+    recont_XbjkA->Write();
+    recont_XbjkB->Write();
+    recont_XbjkC->Write();
     ofile->cd("..");
 
 
