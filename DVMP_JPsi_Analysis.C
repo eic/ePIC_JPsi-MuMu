@@ -54,7 +54,7 @@ void DVMP_JPsi_Analysis()
     gROOT->ProcessLine("SetePICStyle()");
     //gStyle->SetOptStat(0);
 
-    TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x130ep_Pruned.root";
+    TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x250ep_Pruned.root";
     //TString infile="dis_background/DIS_Q2_1_10_10x130ep_Pruned.root";
     
     std::string filename = infile.Data();
@@ -243,7 +243,8 @@ void DVMP_JPsi_Analysis()
     TH1D *invMassMuMu = new TH1D("invMassMuMu","Invariant Mass of MC Muon Pairs; Invariant Mass (GeV)",100,0.,5.); // Invariant mass histogram
     TH1D *matchedMuMuInvMass = new TH1D("matchedMuMuInvMass","Invariant Mass of Reconstructed Muon Pairs; Invariant Mass (GeV)",100,0.,5.); // Invariant mass histogram
 
-    TH1D *matchedMissingMassEpToJPsiX = new TH1D("matchedMissingMassEpToJPsiX","Missing Mass in e+p -> e+ J/Psi + X from matched tracks; Missing Mass (GeV/c^{2})",100,0.,300.);
+    TH1D *matchedMissingMassEpToJPsiX = new TH1D("matchedMissingMassEpToJPsiX","Missing Mass in e+p -> e' + J/Psi + p' from matched tracks; Missing Mass (GeV/c^{2})",400,-20.,20.);
+    TH1D *matchedMissingMass2EpToJPsiX = new TH1D("matchedMissingMass2EpToJPsiX","Missing Mass Squared in e+p -> e' + J/Psi + p' from matched tracks; Missing Mass Squared (GeV/c^{2})^{2}",800,-40.,40.);
 
     // Define Kinematics Histograms
     TH1D* trueQ2 = new TH1D("trueQ^{2}","True Q^{2} Distribution; Q^{2} (GeV/c^{2})",100,0.,50.);
@@ -252,10 +253,10 @@ void DVMP_JPsi_Analysis()
     TH1D* reconQ2_e = new TH1D("reconQ^{2}_e","Reconstructed Q^{2} Distribution using the electron Method; Q^{2} (GeV/c^{2})",100,0.,50.);
     TH1D* reconQ2_sigma = new TH1D("reconQ^{2}_sigma","Reconstructed Q^{2} Distribution using the sigma Method; Q^{2} (GeV/c^{2})",100,0.,50.);
 
-    TH1D* deltaQ2_DA = new TH1D("deltaQ2_DA","Delta Q^{2} (Reconstructed - True) using the DA Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2}",200,-100.,100.);
-    TH1D* deltaQ2_JB = new TH1D("deltaQ2_JB","Delta Q^{2} (Reconstructed - True) using the JB Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2}",200,-100.,100.);
-    TH1D* deltaQ2_e = new TH1D("deltaQ2_e","Delta Q^{2} (Reconstructed - True) using the electron Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2}",200,-100.,100.);
-    TH1D* deltaQ2_sigma = new TH1D("deltaQ2_sigma","Delta Q^{2} (Reconstructed - True) using the sigma Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2}",200,-100.,100.);
+    TH1D* deltaQ2_DA = new TH1D("deltaQ2_DA","Delta Q^{2} (Reconstructed - True) using the DA Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2} (%)",200,-100.,100.);
+    TH1D* deltaQ2_JB = new TH1D("deltaQ2_JB","Delta Q^{2} (Reconstructed - True) using the JB Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2} (%)",200,-100.,100.);
+    TH1D* deltaQ2_e = new TH1D("deltaQ2_e","Delta Q^{2} (Reconstructed - True) using the electron Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2} (%)",200,-100.,100.);
+    TH1D* deltaQ2_sigma = new TH1D("deltaQ2_sigma","Delta Q^{2} (Reconstructed - True) using the sigma Method; (Q^{2} - Q_{MC}^{2})/Q_{MC}^{2} (%)",200,-100.,100.);
 
     TH2D* reconQ2_DA_vs_trueQ2 = new TH2D("reconQ2_DA_vs_trueQ2","Reconstructed Q^{2} using the DA Method vs True Q^{2}; Q_{MC}^{2} (GeV/c^{2}); Q_{DA}^{2} (GeV/c^{2})",100,0.,50.,100,0.,50.);
 
@@ -265,12 +266,13 @@ void DVMP_JPsi_Analysis()
     TH1D* recont_eX = new TH1D("recont_eX","Reconstructed t Distribution using the eX Method; t (GeV/c)",100,0.,2.);
     TH1D* recont_BABE = new TH1D("recont_BABE","Reconstructed t Distribution using the BABE Method; t (GeV/c)",100,0.,2.);
 
-    TH1D* deltat_eXBABE = new TH1D("deltat_eXBABE","Delta t (Reconstructed - True) using the eXBABE Method; (t - t_{MC})/t_{MC}",200,-100.,100.);
-    TH1D* deltat_eXPT = new TH1D("deltat_eXPT","Delta t (Reconstructed - True) using the eXPT Method; (t - t_{MC})/t_{MC}",200,-100.,100.);
-    TH1D* deltat_eX = new TH1D("deltat_eX","Delta t (Reconstructed - True) using the eX Method; (t - t_{MC})/t_{MC}",200,-100.,100.);
-    TH1D* deltat_BABE = new TH1D("deltat_BABE","Delta t (Reconstructed - True) using the BABE Method; (t - t_{MC})/t_{MC}",200,-100.,100.);
+    TH1D* deltat_eXBABE = new TH1D("deltat_eXBABE","Delta t (Reconstructed - True) using the eXBABE Method; (t - t_{MC})/t_{MC} (%)",200,-100.,100.);
+    TH1D* deltat_eXPT = new TH1D("deltat_eXPT","Delta t (Reconstructed - True) using the eXPT Method; (t - t_{MC})/t_{MC} (%)",200,-100.,100.);
+    TH1D* deltat_eX = new TH1D("deltat_eX","Delta t (Reconstructed - True) using the eX Method; (t - t_{MC})/t_{MC} (%)",200,-100.,100.);
+    TH1D* deltat_BABE = new TH1D("deltat_BABE","Delta t (Reconstructed - True) using the BABE Method; (t - t_{MC})/t_{MC} (%)",200,-100.,100.);
 
     TH2D* recont_eXBABE_vs_truet = new TH2D("recont_eXBABE_vs_truet","Reconstructed t using the eXBABE Method vs True t; t_{MC} (GeV/c); t_{eXBABE} (GeV/c)",100,0.,2.,100,0.,2.);
+    TH2D* deltat_eXBABE_vs_truet = new TH2D("deltat_eXBABE_vs_truet","Delta t (Reconstructed - True) using the eXBABE Method vs True t; t_{MC} (GeV/c); (t_{eXBABE} - t_{MC})/t_{MC}",100,0.,2.,200,-100.,100.);
 
     TH1D* truey = new TH1D("truey","True y Distribution",100,0.,1.0);
     TH1D* recony_DA = new TH1D("recony_DA","Reconstructed y Distribution using the DA method; y",100,0.,1.0);
@@ -280,10 +282,10 @@ void DVMP_JPsi_Analysis()
 
     TH2D* recony_DA_vs_truey = new TH2D("recony_DA_vs_truey","Reconstructed y using the DA Method vs True y; y_{MC}; y_{DA}^{2}",100,0.,1.,100,0.,1.);
 
-    TH1D* deltay_DA = new TH1D("deltay_DA","Delta y (Reconstructed - True) using the DA Method; (y - y_{MC})/y_{MC}",200,-100.,100.);
-    TH1D* deltay_JB = new TH1D("deltay_JB","Delta y (Reconstructed - True) using the JB Method; (y - y_{MC})/y_{MC}",200,-100.,100.);
-    TH1D* deltay_e = new TH1D("deltay_e","Delta y (Reconstructed - True) using the electron Method; (y - y_{MC})/y_{MC}",200,-100.,100.);
-    TH1D* deltay_sigma = new TH1D("deltay_sigma","Delta y (Reconstructed - True) using the sigma Method; (y - y_{MC})/y_{MC}",200,-100.,100.);
+    TH1D* deltay_DA = new TH1D("deltay_DA","Delta y (Reconstructed - True) using the DA Method; (y - y_{MC})/y_{MC} (%)",200,-100.,100.);
+    TH1D* deltay_JB = new TH1D("deltay_JB","Delta y (Reconstructed - True) using the JB Method; (y - y_{MC})/y_{MC} (%)",200,-100.,100.);
+    TH1D* deltay_e = new TH1D("deltay_e","Delta y (Reconstructed - True) using the electron Method; (y - y_{MC})/y_{MC} (%)",200,-100.,100.);
+    TH1D* deltay_sigma = new TH1D("deltay_sigma","Delta y (Reconstructed - True) using the sigma Method; (y - y_{MC})/y_{MC} (%)",200,-100.,100.);
 
     TH1D* truex = new TH1D("truex","True x Distribution; x_bjk",100,0.,0.25);
     TH1D* reconx_DA = new TH1D("reconx_DA","Reconstructed x Distribution using the DA method; x_bjk",100,0.,0.25);
@@ -291,10 +293,10 @@ void DVMP_JPsi_Analysis()
     TH1D* reconx_e = new TH1D("reconx_e","Reconstructed x Distribution using the electron method; x_bjk",100,0.,0.25);
     TH1D* reconx_sigma = new TH1D("reconx_sigma","Reconstructed x Distribution using the sigma method; x_bjk",100,0.,0.25);
 
-    TH1D* deltax_DA = new TH1D("deltax_DA","Delta x (Reconstructed - True) using the DA Method; (x - x_{MC})/x_{MC}",200,-100.,100.);
-    TH1D* deltax_JB = new TH1D("deltax_JB","Delta x (Reconstructed - True) using the JB Method; (x - x_{MC})/x_{MC}",200,-100.,100.);
-    TH1D* deltax_e = new TH1D("deltax_e","Delta x (Reconstructed - True) using the electron Method; (x - x_{MC})/x_{MC}",200,-100.,100.);
-    TH1D* deltax_sigma = new TH1D("deltax_sigma","Delta x (Reconstructed - True) using the sigma Method; (x - x_{MC})/x_{MC}",200,-100.,100.);
+    TH1D* deltax_DA = new TH1D("deltax_DA","Delta x (Reconstructed - True) using the DA Method; (x - x_{MC})/x_{MC} (%)",200,-100.,100.);
+    TH1D* deltax_JB = new TH1D("deltax_JB","Delta x (Reconstructed - True) using the JB Method; (x - x_{MC})/x_{MC} (%)",200,-100.,100.);
+    TH1D* deltax_e = new TH1D("deltax_e","Delta x (Reconstructed - True) using the electron Method; (x - x_{MC})/x_{MC} (%)",200,-100.,100.);
+    TH1D* deltax_sigma = new TH1D("deltax_sigma","Delta x (Reconstructed - True) using the sigma Method; (x - x_{MC})/x_{MC} (%)",200,-100.,100.);
 
     TH1D* truet_XbjkA = new TH1D("truet_XbjkA","True t distribution with bjorken x binning; t_{MC} (GeV/c)",100,0.,2.);
     TH1D* recont_XbjkA = new TH1D("recont_XbjkA","Reconstructed t distribution with bjorken x binning; t_{MC} (GeV/c)",100,0.,2.);
@@ -676,8 +678,10 @@ void DVMP_JPsi_Analysis()
         }
 
         double missingMass = (beamE4Mom + beamp4Mom - scatE4MomR - scatp4MomR - muPlus4MomR - muMinus4MomR).M();
+        double mm2 = (beamE4Mom + beamp4Mom - scatE4MomR - scatp4MomR - muPlus4MomR - muMinus4MomR).M2();
         matchedMissingMassEpToJPsiX->Fill(missingMass);
-        if (TMath::Abs(missingMass) > 2.0) // If missing mass is too large, skip event
+        matchedMissingMass2EpToJPsiX->Fill(mm2);
+        if (missingMass > 2.0 || mm2 < -1) // If missing mass is too large, skip event
         { 
             cutEvents[5]++;
             continue; 
@@ -812,6 +816,7 @@ void DVMP_JPsi_Analysis()
         deltat_BABE->Fill(100*(t_BABE - t_truth)/t_truth);
 
         recont_eXBABE_vs_truet->Fill(t_truth, t_eXBABE);
+        deltat_eXBABE_vs_truet->Fill(t_truth, 100*(t_eXBABE - t_truth)/t_truth);
 
         truey->Fill(y_truth);
         recony_e->Fill(y_e);
@@ -962,6 +967,7 @@ void DVMP_JPsi_Analysis()
     invMassMuMu->Write();
     matchedMuMuInvMass->Write();
     matchedMissingMassEpToJPsiX->Write();
+    matchedMissingMass2EpToJPsiX->Write();
     ofile->cd("..");
     ofile->mkdir("kinematics");
     ofile->cd("kinematics");
@@ -999,6 +1005,7 @@ void DVMP_JPsi_Analysis()
     deltat_eXPT->Write();
     deltat_eX->Write();
     deltat_BABE->Write();
+    deltat_eXBABE_vs_truet->Write();
     deltay_e->Write();
     deltay_JB->Write();
     deltay_DA->Write();
