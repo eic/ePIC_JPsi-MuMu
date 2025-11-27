@@ -50,12 +50,12 @@ void epPlots()
     gROOT->ProcessLine("SetePICStyle()");
     gStyle->SetOptStat(0);
 
-    TString infile="../eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x130ep_Pruned.root";
+    TString infile="../eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x250ep_Pruned.root";
     //TString infile="reconOut/mu-pi_20GeV_reconOut.root";
 
     double protonEnergy = 130; 
 
-    std::string outfilename = "outputs/JPsiMuMu_10ifb_10x130ep_epPlots.root";
+    std::string outfilename = "outputs/JPsiMuMu_10ifb_10x250ep_epPlots.root";
     //std::string outfilename = "outputs/mu-pi_epPlots.root";
 
     // Set output file for the histograms
