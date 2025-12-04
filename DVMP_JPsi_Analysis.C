@@ -54,7 +54,7 @@ void DVMP_JPsi_Analysis()
     gROOT->ProcessLine("SetePICStyle()");
     //gStyle->SetOptStat(0);
 
-    TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x250ep_Pruned.root";
+    TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x130ep_Pruned.root";
     //TString infile="dis_background/DIS_Q2_1_10_10x130ep_Pruned.root";
     
     std::string filename = infile.Data();
@@ -165,6 +165,10 @@ void DVMP_JPsi_Analysis()
     TTreeReaderArray<unsigned int> simuAssocHcalEndcapP(tree_reader, "HcalEndcapPInsertClusterAssociations.simID");
     TTreeReaderArray<unsigned int> recoAssocHcalEndcapP(tree_reader, "HcalEndcapPInsertClusterAssociations.recID");    
     TTreeReaderArray<float> HcalEndcapPEng(tree_reader, "HcalEndcapPInsertClusters.energy");
+
+    TTreeReaderArray<unsigned int> simuAssocLFHcal(tree_reader, "LFHCALClusterAssociations.simID");
+    TTreeReaderArray<unsigned int> recoAssocLFHcal(tree_reader, "LFHCALClusterAssociations.recID");    
+    TTreeReaderArray<float> LFHcalEng(tree_reader, "LFHCALClusters.energy");
 
     TTreeReaderArray<unsigned int> simuAssocHcalEndcapN(tree_reader, "HcalEndcapNClusterAssociations.simID");
     TTreeReaderArray<unsigned int> recoAssocHcalEndcapN(tree_reader, "HcalEndcapNClusterAssociations.recID");
@@ -589,8 +593,8 @@ void DVMP_JPsi_Analysis()
             }
             //recoTrackMom = TVector3(trackMomX[i],trackMomY[i],trackMomZ[i]);
             int simuID = simuAssoc[i];
-            muonFinderReturn =  IsMuon(recoTrackMom[i], simuID, EcalBarrelEng, EcalEndcapPEng, EcalEndcapNEng, HcalBarrelEng, HcalEndcapPEng, HcalEndcapNEng, 
-                                        simuAssocEcalBarrel, simuAssocEcalEndcapP, simuAssocEcalEndcapN, simuAssocHcalBarrel, simuAssocHcalEndcapP, simuAssocHcalEndcapN);
+            muonFinderReturn =  IsMuon(recoTrackMom[i], simuID, EcalBarrelEng, EcalEndcapPEng, EcalEndcapNEng, HcalBarrelEng, HcalEndcapPEng, LFHcalEng, HcalEndcapNEng, 
+                                        simuAssocEcalBarrel, simuAssocEcalEndcapP, simuAssocEcalEndcapN, simuAssocHcalBarrel, simuAssocHcalEndcapP, simuAssocLFHcal, simuAssocHcalEndcapN);
                 
 
             if (muonFinderReturn == true && trackCharge[i] == 1.0)

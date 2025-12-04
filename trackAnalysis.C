@@ -44,7 +44,7 @@
 void trackAnalysis()
   {
 
-    TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x250ep_Pruned.root";
+    TString infile="eicReconOutput/EICreconOut_JPsiMuMu_10ifb_18x275ep_Pruned.root";
     std::string filename = infile.Data();
     std::string beam_config;
     std::string marker = "_Pruned.root";

@@ -12,6 +12,7 @@
 #include <TCut.h>
 #include <TProfile.h>
 #include <TGraph.h>
+#include <TMultiGraph.h>
 #include <TGraphErrors.h>
 #include <TMath.h>
 #include <TRandom.h>
@@ -46,17 +47,17 @@
 
 void epPlots()
 {
-    gROOT->SetBatch(kTRUE);
+    //gROOT->SetBatch(kTRUE);
     gROOT->ProcessLine("SetePICStyle()");
     gStyle->SetOptStat(0);
 
-    TString infile="../eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x250ep_Pruned.root";
-    //TString infile="reconOut/mu-pi_20GeV_reconOut.root";
+    //TString infile="../eicReconOutput/EICreconOut_JPsiMuMu_10ifb_10x130ep_Pruned.root";
+    TString infile="reconOut/mu-pi_20GeV_reconOut.root";
+    //TString infile="../dis_background/DIS_Q2_1_10_10x130ep_Pruned.root";
 
-    double protonEnergy = 130; 
-
-    std::string outfilename = "outputs/JPsiMuMu_10ifb_10x250ep_epPlots.root";
-    //std::string outfilename = "outputs/mu-pi_epPlots.root";
+    //std::string outfilename = "outputs/DIS_Q2_1_10_10x130ep_epPlots.root";
+    std::string outfilename = "outputs/mu-pi_epPlots.root";
+    //std::string outfilename = "outputs/JPsiMuMu_10ifb_10x130ep_epPlots.root";
 
     // Set output file for the histograms
     TFile *ofile = TFile::Open(outfilename.c_str(),"RECREATE");
@@ -139,6 +140,10 @@ void epPlots()
     TTreeReaderArray<unsigned int> recoAssocHcalEndcapP(tree_reader, "HcalEndcapPInsertClusterAssociations.recID");    
     TTreeReaderArray<float> HcalEndcapPEng(tree_reader, "HcalEndcapPInsertClusters.energy");
 
+    TTreeReaderArray<unsigned int> simuAssocLFHcal(tree_reader, "LFHCALClusterAssociations.simID");
+    TTreeReaderArray<unsigned int> recoAssocLFHcal(tree_reader, "LFHCALClusterAssociations.recID");    
+    TTreeReaderArray<float> LFHcalEng(tree_reader, "LFHCALClusters.energy");
+
     TTreeReaderArray<unsigned int> simuAssocHcalEndcapN(tree_reader, "HcalEndcapNClusterAssociations.simID");
     TTreeReaderArray<unsigned int> recoAssocHcalEndcapN(tree_reader, "HcalEndcapNClusterAssociations.recID");
     TTreeReaderArray<float> HcalEndcapNEng(tree_reader, "HcalEndcapNClusters.energy");
@@ -151,56 +156,62 @@ void epPlots()
     TH1D *muonRecEta = new TH1D("muonEta","Muon Pseudo-rapidity; eta; Counts",100,-5.,5.);
 
     // Momentum plots by particle
-    TH1D *allParticlesTrueP = new TH1D("allParticlesTrueP","Momentum of all Generated Particles; p [GeV/c]; Counts",100,0.,25.);
-    TH1D *allParticlesTrueP_PC = new TH1D("allParticlesTrueP_PC","Momentum of all Reconstructed Particles post cuts; p [GeV/c]; Counts",100,0.,25.);
+    TH1D *allParticlesTrueP = new TH1D("allParticlesTrueP","Momentum of all Generated Particles; p [GeV/c]; Counts",50,0.,25.);
+    TH1D *allParticlesTrueP_PC = new TH1D("allParticlesTrueP_PC","Momentum of all Reconstructed Particles post cuts; p [GeV/c]; Counts",50,0.,25.);
 
-    TH2D *allParticlesTrueEtaP =  new TH2D("allParticlesTrueEtaP", "Momentum of all Generated Particles against Eta; p [GeV/c]; eta",100,0.,25.,100,-5.,5);
-    TH2D *allParticlesTrueEtaP_PC =  new TH2D("allParticlesTrueEtaP_PC", "Momentum of all Reconstructed Particles against Eta post cuts; p [GeV/c]; eta",100,0.,25.,100,-5.,5);
+    TH2D *allParticlesTrueEtaP =  new TH2D("allParticlesTrueEtaP", "Momentum of all Generated Particles against Eta; p [GeV/c]; eta",50,0.,25.,100,-5.,5);
+    TH2D *allParticlesTrueEtaP_PC =  new TH2D("allParticlesTrueEtaP_PC", "Momentum of all Reconstructed Particles against Eta post cuts; p [GeV/c]; eta",50,0.,25.,100,-5.,5);
 
-    TH1D *protonRecP = new TH1D("protonP","Reconstructed Proton Momentum; p [GeV/c]; Counts",100,0.,25.);
-    TH1D *electronRecP = new TH1D("electronP","Reconstructed Electron Momentum; p [GeV/c]; Counts",100,0.,25.);
-    TH1D *pionRecP = new TH1D("pionP","Reconstructed Pion Momentum; p [GeV/c]; Counts",100,0.,25.);
-    TH1D *kaonRecP = new TH1D("kaonP","Reconstructed Kaon Momentum; p [GeV/c]; Counts",100,0.,25.);
+    TH1D *protonRecP = new TH1D("protonP","Reconstructed Proton Momentum; p [GeV/c]; Counts",50,0.,25.);
+    TH1D *electronRecP = new TH1D("electronP","Reconstructed Electron Momentum; p [GeV/c]; Counts",50,0.,25.);
+    TH1D *pionRecP = new TH1D("pionP","Reconstructed Pion Momentum; p [GeV/c]; Counts",50,0.,25.);
+    TH1D *kaonRecP = new TH1D("kaonP","Reconstructed Kaon Momentum; p [GeV/c]; Counts",50,0.,25.);
 
-    TH1D *muonTrueP = new TH1D("muonTrueP","Momentum of Generated Muons;p [GeV/c]",100,0.,25.);
-    TH2D *muonTruePEta = new TH2D("muonTruePEta","Momentum of Generated Muons against eta; p [GeV/c]; eta",100,0.,25.,100,-5.,5);
+    TH1D *muonTrueP = new TH1D("muonTrueP","Momentum of Generated Muons;p [GeV/c]",50,0.,25.);
+    TH2D *muonTruePEta = new TH2D("muonTruePEta","Momentum of Generated Muons against eta; p [GeV/c]; eta",50,0.,25.,100,-5.,5);
 
-    TH2D *muonRecPEta = new TH2D("muonRecPEta","Reconstructed of Generated Muons against eta; p [GeV/c]; eta",100,0.,25.,100,-5.,5);
-    TH1D *muonRecP = new TH1D("muonP","Reconstructed Muon Momentum; p [GeV/c]; Counts",100,0.,25.);
+    TH2D *muonRecPEta = new TH2D("muonRecPEta","Reconstructed of Generated Muons against eta; p [GeV/c]; eta",50,0.,25.,100,-5.,5);
+    TH1D *muonRecP = new TH1D("muonP","Reconstructed Muon Momentum; p [GeV/c]; Counts",50,0.,25.);
     
-    TH1D *muonMomEff = new TH1D("muonMomEff","Efficency;Momentum (GeV/c)",100,0.,25.);
-    TH1D *muonMomPur = new TH1D("muonMomPur","Purity;Momentum (GeV/c)",100,0.,25.);
+    TH1D *muonMomEff = new TH1D("muonMomEff","Efficency;Momentum (GeV/c)",50,0.,25.);
+    TH1D *muonMomPur = new TH1D("muonMomPur","Purity;Momentum (GeV/c)",50,0.,25.);
 
-    TH2D *muonMomEtaEff = new TH2D("muonMomEtaEff","Efficency as a function of eta and momentum; p [GeV/c]; eta",100,0.,25.,100,-5.,5);
-    TH2D *muonMomEtaPur = new TH2D("muonMomEtaPur","Purity as a function of eta and momentum; p [GeV/c]; eta",100,0.,25.,100,-5.,5);
+    TH2D *muonMomEtaEff = new TH2D("muonMomEtaEff","Efficency as a function of eta and momentum; p [GeV/c]; eta",50,0.,25.,100,-5.,5);
+    TH2D *muonMomEtaPur = new TH2D("muonMomEtaPur","Purity as a function of eta and momentum; p [GeV/c]; eta",50,0.,25.,100,-5.,5);
 
     TH1D *muonRecMinusTrueP = new TH1D("muonRecMinusTrueP","Muon Momentum Difference; p [GeV/c]; Counts",100,-25.,25.);
 
     // Ecal ep Plots by particle
-    TH2D *protonEpTrueEcal = new TH2D("protonEpTrueEcal","Ecal Energy vs Track Momentum for Protons; p;  E/p",100,0.,25.,200,0.,2.0);
-    TH2D *electronEpTrueEcal = new TH2D("electronEpTrueEcal","Ecal Energy vs Track Momentum for Electrons; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *pionEpTrueEcal = new TH2D("pionEpTrueEcal","Ecal Energy vs Track Momentum for Pions; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *kaonEpTrueEcal = new TH2D("kaonEpTrueEcal","Ecal Energy vs Track Momentum for Kaons; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *muonEpTrueEcal = new TH2D("muonEpTrueEcal","Ecal Energy vs Track Momentum for Muons; p;  E/p",100,0.,25.,100,0.,2.0);
+    TH2D *protonEpTrueEcal = new TH2D("protonEpTrueEcal","Ecal Energy vs Track Momentum for Protons; p;  E/p",50,0.,25.,200,0.,2.0);
+    TH2D *electronEpTrueEcal = new TH2D("electronEpTrueEcal","Ecal Energy vs Track Momentum for Electrons; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *pionEpTrueEcal = new TH2D("pionEpTrueEcal","Ecal Energy vs Track Momentum for Pions; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *kaonEpTrueEcal = new TH2D("kaonEpTrueEcal","Ecal Energy vs Track Momentum for Kaons; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *muonEpTrueEcal = new TH2D("muonEpTrueEcal","Ecal Energy vs Track Momentum for Muons; p;  E/p",50,0.,25.,100,0.,2.0);
 
-    TH2D *protonEpRecEcal = new TH2D("protonEpRecEcal","Ecal Energy vs Track Momentum for Protons; p;  E/p",100,0.,25.,200,0.,2.0);
-    TH2D *electronEpRecEcal = new TH2D("electronEpRecEcal","Ecal Energy vs Track Momentum for Electrons; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *pionEpRecEcal = new TH2D("pionEpRecEcal","Ecal Energy vs Track Momentum for Pions; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *kaonEpRecEcal = new TH2D("kaonEpRecEcal","Ecal Energy vs Track Momentum for Kaons; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *muonEpRecEcal = new TH2D("muonEpRecEcal","Ecal Energy vs Track Momentum for Muons; p;  E/p",100,0.,25.,100,0.,2.0);
+    TH2D *protonEpRecEcal = new TH2D("protonEpRecEcal","Ecal Energy vs Track Momentum for Protons; p;  E/p",50,0.,25.,200,0.,2.0);
+    TH2D *electronEpRecEcal = new TH2D("electronEpRecEcal","Ecal Energy vs Track Momentum for Electrons; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *pionEpRecEcal = new TH2D("pionEpRecEcal","Ecal Energy vs Track Momentum for Pions; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *kaonEpRecEcal = new TH2D("kaonEpRecEcal","Ecal Energy vs Track Momentum for Kaons; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *muonEpRecEcal = new TH2D("muonEpRecEcal","Ecal Energy vs Track Momentum for Muons; p;  E/p",50,0.,25.,100,0.,2.0);
+
+    TH2D *mupiEpTrueEcalvsEta = new TH2D("mupiEpTrueEcalvsEta","Ecal Energy vs Track Eta for all particles; eta;  E/p",100,-5.,5.,100,0.,2.0);
+    TH2D *mupiEpRecEcalvsEta = new TH2D("mupiEpRecEcalvsEta","Ecal Energy vs Track Eta for all particles; eta;  E/p",100,-5.,5.,100,0.,2.0);
 
     // Hcal ep Plots by particle
-    TH2D *protonEpTrueHcal = new TH2D("protonEpTrueHcal","Hcal Energy vs Track Momentum for Protons; p;  E/p",100,0.,25.,200,0.,2.0);
-    TH2D *electronEpTrueHcal = new TH2D("electronEpTrueHcal","Hcal Energy vs Track Momentum for Electrons; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *pionEpTrueHcal = new TH2D("pionEpTrueHcal","Hcal Energy vs Track Momentum for Pions; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *kaonEpTrueHcal = new TH2D("kaonEpTrueHcal","Hcal Energy vs Track Momentum for Kaons; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *muonEpTrueHcal = new TH2D("muonEpTrueHcal","Hcal Energy vs Track Momentum for Muons; p;  E/p",100,0.,25.,100,0.,2.0);
+    TH2D *protonEpTrueHcal = new TH2D("protonEpTrueHcal","Hcal Energy vs Track Momentum for Protons; p;  E/p",50,0.,25.,200,0.,2.0);
+    TH2D *electronEpTrueHcal = new TH2D("electronEpTrueHcal","Hcal Energy vs Track Momentum for Electrons; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *pionEpTrueHcal = new TH2D("pionEpTrueHcal","Hcal Energy vs Track Momentum for Pions; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *kaonEpTrueHcal = new TH2D("kaonEpTrueHcal","Hcal Energy vs Track Momentum for Kaons; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *muonEpTrueHcal = new TH2D("muonEpTrueHcal","Hcal Energy vs Track Momentum for Muons; p;  E/p",50,0.,25.,100,0.,2.0);
 
-    TH2D *protonEpRecHcal = new TH2D("protonEpRecHcal","Hcal Energy vs Track Momentum for Protons; p;  E/p",100,0.,25.,200,0.,2.0);
-    TH2D *electronEpRecHcal = new TH2D("electronEpRecHcal","Hcal Energy vs Track Momentum for Electrons; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *pionEpRecHcal = new TH2D("pionEpRecHcal","Hcal Energy vs Track Momentum for Pions; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *kaonEpRecHcal = new TH2D("kaonEpRecHcal","Hcal Energy vs Track Momentum for Kaons; p;  E/p",100,0.,25.,100,0.,2.0);
-    TH2D *muonEpRecHcal = new TH2D("muonEpRecHcal","Hcal Energy vs Track Momentum for Muons; p;  E/p",100,0.,25.,100,0.,2.0);
+    TH2D *protonEpRecHcal = new TH2D("protonEpRecHcal","Hcal Energy vs Track Momentum for Protons; p;  E/p",50,0.,25.,200,0.,2.0);
+    TH2D *electronEpRecHcal = new TH2D("electronEpRecHcal","Hcal Energy vs Track Momentum for Electrons; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *pionEpRecHcal = new TH2D("pionEpRecHcal","Hcal Energy vs Track Momentum for Pions; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *kaonEpRecHcal = new TH2D("kaonEpRecHcal","Hcal Energy vs Track Momentum for Kaons; p;  E/p",50,0.,25.,100,0.,2.0);
+    TH2D *muonEpRecHcal = new TH2D("muonEpRecHcal","Hcal Energy vs Track Momentum for Muons; p;  E/p",50,0.,25.,100,0.,2.0);
+
+    TH2D *mupiEpTrueHcalvsEta = new TH2D("mupiEpTrueHcalvsEta","Hcal Energy vs Track Eta for all particles; eta;  E/p",100,-5.,5.,100,0.,2.0);
+    TH2D *mupiEpRecHcalvsEta = new TH2D("mupiEpRecHcalvsEta","Hcal Energy vs Track Eta for all particles; eta;  E/p",100,-5.,5.,100,0.,2.0);
 
     // Ecal vs Hcal energy Plots by particle
     TH2D *protonEpTrueEHcal = new TH2D("protonEpTrueEHcal","Ecal Energy vs Hcal Energy for Protons; E/p;  E/p",100,0.,2.0,100,0.,2.0);
@@ -216,23 +227,23 @@ void epPlots()
     TH2D *muonEpRecEHcal = new TH2D("muonEpRecEHcal","Ecal Energy vs Hcal Energy for Muons; E/p;  E/p",100,0.,2.0,100,0.,2.0);
 
     // Cluster Size Plots by particle
-    TH1D *protonEcalClusterSize = new TH1D("protonEcalClusterSize","Ecal Barrel Cluster Size for Protons; Size; Counts",100,0.,50.);
-    TH1D *electronEcalClusterSize = new TH1D("electronEcalClusterSize","Ecal Barrel Cluster Size for Electrons; Size; Counts",100,0.,50.);
-    TH1D *pionEcalClusterSize = new TH1D("pionEcalClusterSize","Ecal Barrel Cluster Size for Pions; Size; Counts",100,0.,50.);
-    TH1D *kaonEcalClusterSize = new TH1D("kaonEcalClusterSize","Ecal Barrel Cluster Size for Kaons; Size; Counts",100,0.,50.);
-    TH1D *muonEcalClusterSize = new TH1D("muonEcalClusterSize","Ecal Barrel Cluster Size for Muons; Size; Counts",100,0.,50.);
+    TH2D *protonEcalClusterSize = new TH2D("protonEcalClusterSize","Ecal Barrel Cluster Size for Protons; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
+    TH2D *electronEcalClusterSize = new TH2D("electronEcalClusterSize","Ecal Barrel Cluster Size for Electrons; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
+    TH2D *pionEcalClusterSize = new TH2D("pionEcalClusterSize","Ecal Barrel Cluster Size for Pions; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
+    TH2D *kaonEcalClusterSize = new TH2D("kaonEcalClusterSize","Ecal Barrel Cluster Size for Kaons; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
+    TH2D *muonEcalClusterSize = new TH2D("muonEcalClusterSize","Ecal Barrel Cluster Size for Muons; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
 
-    TH1D *protonHcalClusterSize = new TH1D("protonHcalClusterSize","Hcal Barrel Cluster Size for Protons; Size; Counts",100,0.,50.);
-    TH1D *electronHcalClusterSize = new TH1D("electronHcalClusterSize","Hcal Barrel Cluster Size for Electrons; Size; Counts",100,0.,50.);
-    TH1D *pionHcalClusterSize = new TH1D("pionHcalClusterSize","Hcal Barrel Cluster Size for Pions; Size; Counts",100,0.,50.);
-    TH1D *kaonHcalClusterSize = new TH1D("kaonHcalClusterSize","Hcal Barrel Cluster Size for Kaons; Size; Counts",100,0.,50.);
-    TH1D *muonHcalClusterSize = new TH1D("muonHcalClusterSize","Hcal Barrel Cluster Size for Muons; Size; Counts",100,0.,50.);
+    TH2D *protonHcalClusterSize = new TH2D("protonHcalClusterSize","Hcal Barrel Cluster Size for Protons; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
+    TH2D *electronHcalClusterSize = new TH2D("electronHcalClusterSize","Hcal Barrel Cluster Size for Electrons; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
+    TH2D *pionHcalClusterSize = new TH2D("pionHcalClusterSize","Hcal Barrel Cluster Size for Pions; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
+    TH2D *kaonHcalClusterSize = new TH2D("kaonHcalClusterSize","Hcal Barrel Cluster Size for Kaons; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
+    TH2D *muonHcalClusterSize = new TH2D("muonHcalClusterSize","Hcal Barrel Cluster Size for Muons; Momentum (GeV/c); Size",50,0.,25.,100,0.,50.);
 
-    TH1D *protonEHcalClusterSize = new TH1D("protonEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Protons; Size; Counts",200,0.,100.);
-    TH1D *electronEHcalClusterSize = new TH1D("electronEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Electrons; Size; Counts",200,0.,100.);
-    TH1D *pionEHcalClusterSize = new TH1D("pionEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Pions; Size; Counts",200,0.,100.);
-    TH1D *kaonEHcalClusterSize = new TH1D("kaonEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Kaons; Size; Counts",200,0.,100.);
-    TH1D *muonEHcalClusterSize = new TH1D("muonEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Muons; Size; Counts",200,0.,100.);
+    TH2D *protonEHcalClusterSize = new TH2D("protonEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Protons; Momentum (GeV/c); Size",50,0.,25.,200,0.,100.);
+    TH2D *electronEHcalClusterSize = new TH2D("electronEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Electrons; Momentum (GeV/c); Size",50,0.,25.,200,0.,100.);
+    TH2D *pionEHcalClusterSize = new TH2D("pionEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Pions; Momentum (GeV/c); Size",50,0.,25.,200,0.,100.);
+    TH2D *kaonEHcalClusterSize = new TH2D("kaonEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Kaons; Momentum (GeV/c); Size",50,0.,25.,200,0.,100.);
+    TH2D *muonEHcalClusterSize = new TH2D("muonEHcalClusterSize","Ecal + Hcal Barrel Cluster Size for Muons; Momentum (GeV/c); Size",50,0.,25.,200,0.,100.);
 
     // Post cut plot
 
@@ -245,24 +256,26 @@ void epPlots()
     TH1D *pionPostCutEta = new TH1D("pionPCEta","Pion Pseudo-rapidity post cuts; eta; Counts",100,-5.,5.);
     TH1D *muonPostCutEta = new TH1D("muonPCEta","Muon Pseudo-rapidity post cuts; eta; Counts",100,-5.,5.);
 
-    TH1D *pionPostCutP = new TH1D("pionPCP","Pion Momentum post cuts; p [GeV/c]; Counts",100,0.,25.);
-    TH1D *muonPostCutP = new TH1D("muonPCP","Muon Momentum post cuts; p [GeV/c]; Counts",100,0.,25.);
+    TH1D *pionPostCutP = new TH1D("pionPCP","Pion Momentum post cuts; p [GeV/c]; Counts",50,0.,25.);
+    TH1D *muonPostCutP = new TH1D("muonPCP","Muon Momentum post cuts; p [GeV/c]; Counts",50,0.,25.);
+
+    // E/p cut functions
+
+    TF1 *eCalCutFunction = new TF1("eCalCutFunction","[0]/(x + [1])",0.,20.,0.,20.);
+    eCalCutFunction->SetParameter(0,0.29);
+    eCalCutFunction->SetParameter(1,0.23);
+
+    TF1 *eCalCutWidthFunction = new TF1("eCalCutWidthFunction","3*([0]/x)",0.,20.);
+    eCalCutWidthFunction->SetParameter(0,0.09);
+
+    TF1 *hCalCutFunction = new TF1("hCalCutFunction","[0]/(x + [1])",0.,20.,0.,20.);
+    hCalCutFunction->SetParameter(0,1.03);
+    hCalCutFunction->SetParameter(1,0.44);
+
+    TF1 *hCalCutWidthFunction = new TF1("hCalCutWidthFunction","3*([0]/x)",0.,20.);
+    hCalCutWidthFunction->SetParameter(0,0.21);
 
     // Define 3 and 4-momentum vectors for particles
-
-    TVector3 beamEMom;
-    ROOT::Math::PxPyPzEVector beamE4Mom;
-    TVector3 scatEMomT;
-    ROOT::Math::PxPyPzEVector scatE4MomT;
-    TVector3 scatEMomR;
-    ROOT::Math::PxPyPzEVector scatE4MomR;
-
-    TVector3 beampMom;
-    ROOT::Math::PxPyPzEVector beamp4Mom;
-    TVector3 scatpMomT;
-    ROOT::Math::PxPyPzEVector scatp4MomT;
-    TVector3 scatpMomR;
-    ROOT::Math::PxPyPzEVector scatp4MomR;
 
     TVector3 muPlusMomT;
     ROOT::Math::PxPyPzEVector muPlus4MomT;
@@ -283,26 +296,6 @@ void epPlots()
     double xbjk_truth, xbjk_rec;
     double partEng;
 
-    // Defining initial colliding beams
-    double eMass = 0.000510998950; //electron beam
-    double eEng = 10;
-    double e_pmag = sqrt(pow(eEng,2)-pow(eMass,2));
-    double e_p1 = 0.;
-    double e_p2 = 0.;
-    double e_p3 = -1*e_pmag;
-    beamEMom = TVector3(e_p1, e_p2, e_p3);
-    beamE4Mom  = ROOT::Math::PxPyPzEVector(e_p1, e_p2, e_p3, eEng); 
-                
-    double pMass = 0.93827208816; // proton beam
-    double pEng = protonEnergy; //change
-    double p_pmag = sqrt(pow(pEng,2)-pow(pMass,2));
-    double c_a = 0.025;
-    double p_p1 = -p_pmag*sin(c_a);
-    double p_p2 = 0.;
-    double p_p3 = p_pmag*cos(c_a);
-    beampMom = TVector3(p_p1, p_p2, p_p3);
-    beamp4Mom = ROOT::Math::PxPyPzEVector(p_p1, p_p2, p_p3, pEng);
-
     int eventID = 0; // Event ID counter
     double ECalEnergy = 0.;
     double HCalEnergy = 0.;
@@ -317,6 +310,8 @@ void epPlots()
     double protons[5] = {0,0,0,0,0};
     double electrons[5] = {0,0,0,0,0};
 
+    bool piEcalSlices, muEcalSlices, piHcalSlices, muHcalSlices = false;
+
     while(tree_reader.Next()) // Loop over events
     {
       eventID++;
@@ -328,16 +323,6 @@ void epPlots()
       }
 
       // Reset vectors
-      scatEMomT = TVector3(0.,0.,0.);
-      scatE4MomT.SetPxPyPzE(0.,0.,0.,0.);
-      scatEMomR = TVector3(0.,0.,0.);
-      scatE4MomR.SetPxPyPzE(0.,0.,0.,0.);
-
-      scatpMomT = TVector3(0.,0.,0.);
-      scatp4MomT.SetPxPyPzE(0.,0.,0.,0.);
-      scatpMomR = TVector3(0.,0.,0.);
-      scatp4MomR.SetPxPyPzE(0.,0.,0.,0.);
-
       muPlusMomT = TVector3(0.,0.,0.);
       muPlus4MomT.SetPxPyPzE(0.,0.,0.,0.);
       muPlusMomR = TVector3(0.,0.,0.);
@@ -359,11 +344,6 @@ void epPlots()
         {
             partEng = sqrt(pow(partMomX[i],2) + pow(partMomY[i],2) + pow(partMomZ[i],2) + pow(partMass[i],2)); // Energy of Monte Carlo particle
             double partEta = TVector3(partMomX[i],partMomY[i],partMomZ[i]).Eta();
-
-            if (partPdg[i]== 2212){
-                scatpMomT = TVector3(partMomX[i],partMomY[i],partMomZ[i]);
-                scatp4MomT.SetPxPyPzE(partMomX[i],partMomY[i],partMomZ[i], partEng);
-            }
 
             if (partEta < -4 || partEta > 4) continue;
             if (TVector3(partMomX[i],partMomY[i],partMomZ[i]).Mag() < 0.05 || TVector3(partMomX[i],partMomY[i],partMomZ[i]).Mag() > 20) continue;
@@ -469,6 +449,18 @@ void epPlots()
                     }
                 }
             }
+
+            if (LFHcalEng.GetSize() == simuAssocLFHcal.GetSize())
+            {
+                for (int jL = 0; jL < simuAssocLFHcal.GetSize(); jL++) // Look for associations in the LFHcal
+                {
+                    if (simuAssocLFHcal[jL] == simuAssoc[i])
+                    {
+                        HCalEnergy += LFHcalEng[jL];
+                        HcalHits += 1.;
+                    }
+                }
+            }
             
             if (HcalEndcapNEng.GetSize() == simuAssocHcalEndcapN.GetSize())
             {
@@ -492,6 +484,7 @@ void epPlots()
 
             if (ECalEnergy > 0. && HCalEnergy > 0.)
             {
+
                 switch (TMath::Abs(partPdg[simuAssoc[i]]))
                 {
                     case 2212:
@@ -503,9 +496,9 @@ void epPlots()
                         protonEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
                         protonEpTrueEHcal->Fill(ECalEnergy/trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         protonEpRecEHcal->Fill(ECalEnergy/recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        protonEcalClusterSize->Fill(EcalHits);
-                        protonHcalClusterSize->Fill(HcalHits);
-                        protonEHcalClusterSize->Fill(EcalHits+HcalHits);
+                        protonEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
+                        protonHcalClusterSize->Fill(recoMom.Mag(),HcalHits);
+                        protonEHcalClusterSize->Fill(recoMom.Mag(),EcalHits+HcalHits);
                         break;
                     case 11:
                         electronRecEta->Fill(recoMom.PseudoRapidity());
@@ -516,9 +509,9 @@ void epPlots()
                         electronEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
                         electronEpTrueEHcal->Fill(ECalEnergy/trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         electronEpRecEHcal->Fill(ECalEnergy/recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        electronEcalClusterSize->Fill(EcalHits);
-                        electronHcalClusterSize->Fill(HcalHits);
-                        electronEHcalClusterSize->Fill(EcalHits+HcalHits);
+                        electronEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
+                        electronHcalClusterSize->Fill(recoMom.Mag(),HcalHits);
+                        electronEHcalClusterSize->Fill(recoMom.Mag(),EcalHits+HcalHits);
                         break;
                     case 211:
                         pionRecEta->Fill(recoMom.PseudoRapidity());
@@ -529,9 +522,13 @@ void epPlots()
                         pionEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
                         pionEpTrueEHcal->Fill(ECalEnergy/trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         pionEpRecEHcal->Fill(ECalEnergy/recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        pionEcalClusterSize->Fill(EcalHits);
-                        pionHcalClusterSize->Fill(HcalHits);
-                        pionEHcalClusterSize->Fill(EcalHits+HcalHits);
+                        pionEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
+                        pionHcalClusterSize->Fill(recoMom.Mag(),HcalHits);
+                        pionEHcalClusterSize->Fill(recoMom.Mag(),EcalHits+HcalHits);
+                        mupiEpRecEcalvsEta->Fill(recoMom.PseudoRapidity(), ECalEnergy/recoMom.Mag());
+                        mupiEpTrueEcalvsEta->Fill(trueMom.PseudoRapidity(), ECalEnergy/trueMom.Mag());
+                        mupiEpRecHcalvsEta->Fill(recoMom.PseudoRapidity(), HCalEnergy/recoMom.Mag());
+                        mupiEpTrueHcalvsEta->Fill(trueMom.PseudoRapidity(), HCalEnergy/trueMom.Mag());
                         break;
                     case 321:
                         kaonRecEta->Fill(recoMom.PseudoRapidity());
@@ -542,9 +539,9 @@ void epPlots()
                         kaonEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
                         kaonEpTrueEHcal->Fill(ECalEnergy/trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         kaonEpRecEHcal->Fill(ECalEnergy/recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        kaonEcalClusterSize->Fill(EcalHits);
-                        kaonHcalClusterSize->Fill(HcalHits);
-                        kaonEHcalClusterSize->Fill(EcalHits+HcalHits);
+                        kaonEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
+                        kaonHcalClusterSize->Fill(recoMom.Mag(),HcalHits);
+                        kaonEHcalClusterSize->Fill(recoMom.Mag(),EcalHits+HcalHits);
                         break;
                     case 13:
                         muonRecEta->Fill(recoMom.PseudoRapidity());
@@ -555,9 +552,13 @@ void epPlots()
                         muonEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
                         muonEpTrueEHcal->Fill(ECalEnergy/trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         muonEpRecEHcal->Fill(ECalEnergy/recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        muonEcalClusterSize->Fill(EcalHits);
-                        muonHcalClusterSize->Fill(HcalHits);
-                        muonEHcalClusterSize->Fill(EcalHits+HcalHits);
+                        muonEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
+                        muonHcalClusterSize->Fill(recoMom.Mag(),HcalHits);
+                        muonEHcalClusterSize->Fill(recoMom.Mag(),EcalHits+HcalHits);
+                        mupiEpRecEcalvsEta->Fill(recoMom.PseudoRapidity(), ECalEnergy/recoMom.Mag());
+                        mupiEpTrueEcalvsEta->Fill(trueMom.PseudoRapidity(), ECalEnergy/trueMom.Mag());
+                        mupiEpRecHcalvsEta->Fill(recoMom.PseudoRapidity(), HCalEnergy/recoMom.Mag());
+                        mupiEpTrueHcalvsEta->Fill(trueMom.PseudoRapidity(), HCalEnergy/trueMom.Mag());
                         break;
                     default:
                         break;
@@ -565,6 +566,7 @@ void epPlots()
             }
             else if (ECalEnergy > 0. && HCalEnergy == 0.)
             {
+
                 switch (TMath::Abs(partPdg[simuAssoc[i]]))
                 {
                     case 2212:
@@ -572,35 +574,39 @@ void epPlots()
                         protonRecP->Fill(recoMom.Mag());
                         protonEpTrueEcal->Fill(trueMom.Mag(), ECalEnergy/trueMom.Mag());
                         protonEpRecEcal->Fill(recoMom.Mag(), ECalEnergy/recoMom.Mag());
-                        protonEcalClusterSize->Fill(EcalHits);
+                        protonEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
                         break;
                     case 11:
                         electronRecEta->Fill(recoMom.PseudoRapidity());
                         electronRecP->Fill(recoMom.Mag());
                         electronEpTrueEcal->Fill(trueMom.Mag(), ECalEnergy/trueMom.Mag());
                         electronEpRecEcal->Fill(recoMom.Mag(), ECalEnergy/recoMom.Mag());
-                        electronEcalClusterSize->Fill(EcalHits);
+                        electronEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
                         break;
                     case 211:
                         pionRecEta->Fill(recoMom.PseudoRapidity());
                         pionRecP->Fill(recoMom.Mag());
                         pionEpTrueEcal->Fill(trueMom.Mag(), ECalEnergy/trueMom.Mag());
                         pionEpRecEcal->Fill(recoMom.Mag(), ECalEnergy/recoMom.Mag());
-                        pionEcalClusterSize->Fill(EcalHits);
+                        pionEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
+                        mupiEpRecEcalvsEta->Fill(recoMom.PseudoRapidity(), ECalEnergy/recoMom.Mag());
+                        mupiEpTrueEcalvsEta->Fill(trueMom.PseudoRapidity(), ECalEnergy/trueMom.Mag());
                         break;
                     case 321:
                         kaonRecEta->Fill(recoMom.PseudoRapidity());
                         kaonRecP->Fill(recoMom.Mag());
                         kaonEpTrueEcal->Fill(trueMom.Mag(), ECalEnergy/trueMom.Mag());
                         kaonEpRecEcal->Fill(recoMom.Mag(), ECalEnergy/recoMom.Mag());
-                        kaonEcalClusterSize->Fill(EcalHits);
+                        kaonEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
                         break;
                     case 13:
                         muonRecEta->Fill(recoMom.PseudoRapidity());
                         muonRecP->Fill(recoMom.Mag());
                         muonEpTrueEcal->Fill(trueMom.Mag(), ECalEnergy/trueMom.Mag());
                         muonEpRecEcal->Fill(recoMom.Mag(), ECalEnergy/recoMom.Mag());
-                        muonEcalClusterSize->Fill(EcalHits);
+                        muonEcalClusterSize->Fill(recoMom.Mag(),EcalHits);
+                        mupiEpRecEcalvsEta->Fill(recoMom.PseudoRapidity(), ECalEnergy/recoMom.Mag());
+                        mupiEpTrueEcalvsEta->Fill(trueMom.PseudoRapidity(), ECalEnergy/trueMom.Mag());
                         break;
                     default:
                         break;
@@ -608,6 +614,7 @@ void epPlots()
             }
             else if (ECalEnergy == 0. && HCalEnergy > 0.)
             {
+
                 switch (TMath::Abs(partPdg[simuAssoc[i]]))
                 {
                     case 2212:
@@ -615,35 +622,39 @@ void epPlots()
                         protonRecP->Fill(recoMom.Mag());
                         protonEpTrueHcal->Fill(trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         protonEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        protonHcalClusterSize->Fill(HcalHits);
+                        protonHcalClusterSize->Fill(recoMom.Mag(),HcalHits);
                         break;
                     case 11:
                         electronRecEta->Fill(recoMom.PseudoRapidity());
                         electronRecP->Fill(recoMom.Mag());
                         electronEpTrueHcal->Fill(trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         electronEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        electronHcalClusterSize->Fill(HcalHits);
+                        electronHcalClusterSize->Fill(recoMom.Mag(),HcalHits);
                         break;
                     case 211:
                         pionRecEta->Fill(recoMom.PseudoRapidity());
                         pionRecP->Fill(recoMom.Mag());
                         pionEpTrueHcal->Fill(trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         pionEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        pionHcalClusterSize->Fill(HcalHits);
+                        pionHcalClusterSize->Fill(recoMom.Mag(),HcalHits);
+                        mupiEpRecHcalvsEta->Fill(recoMom.PseudoRapidity(), HCalEnergy/recoMom.Mag());
+                        mupiEpTrueHcalvsEta->Fill(trueMom.PseudoRapidity(), HCalEnergy/trueMom.Mag());
                         break;
                     case 321:
                         kaonRecEta->Fill(recoMom.PseudoRapidity());
                         kaonRecP->Fill(recoMom.Mag());
                         kaonEpTrueHcal->Fill(trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         kaonEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        kaonHcalClusterSize->Fill(HcalHits);
+                        kaonHcalClusterSize->Fill(recoMom.Mag(),HcalHits);
                         break;
                     case 13:
                         muonRecEta->Fill(recoMom.PseudoRapidity());
                         muonRecP->Fill(recoMom.Mag());
                         muonEpTrueHcal->Fill(trueMom.Mag(), HCalEnergy/trueMom.Mag());
                         muonEpRecHcal->Fill(recoMom.Mag(), HCalEnergy/recoMom.Mag());
-                        muonHcalClusterSize->Fill(HcalHits);
+                        muonHcalClusterSize->Fill(recoMom.Mag(),HcalHits);        
+                        mupiEpRecHcalvsEta->Fill(recoMom.PseudoRapidity(), HCalEnergy/recoMom.Mag());
+                        mupiEpTrueHcalvsEta->Fill(trueMom.PseudoRapidity(), HCalEnergy/trueMom.Mag());
                         break;
                     default:
                         break;
@@ -754,28 +765,24 @@ void epPlots()
                     bool ECalEpCut; // = (ECalEnergy/recoMom.Mag() < 0.4 && ECalEnergy/recoMom.Mag() >= 0.);
                     bool HCalEpCut;
 
-                    if (recoMom.Mag() > 10.) // Different cuts for low-momentum tracks
+                    if (recoMom.Mag() > 0.5) // Different cuts for low-momentum tracks
                     {
-                        ECalEpCut = (ECalEnergy/recoMom.Mag() <= 0.1 && ECalEnergy/recoMom.Mag() >= 0.);
-                    }
-                    else if (recoMom.Mag() <= 10. && recoMom.Mag() > 0.)
-                    {
-                        double cutValueEcal = -0.03*recoMom.Mag() + 0.4;
-                        ECalEpCut = (ECalEnergy/recoMom.Mag() >= 0. && ECalEnergy/recoMom.Mag() <= cutValueEcal);
+                        double cutValueEcal = eCalCutFunction->Eval(recoMom.Mag());
+                        double cutWidthEcal = eCalCutWidthFunction->Eval(recoMom.Mag());
+
+                        ECalEpCut = (ECalEnergy/recoMom.Mag() >= 0.0 && ECalEnergy/recoMom.Mag() <= cutValueEcal+cutWidthEcal);
                     }
                     else
                     {
                         ECalEpCut = false;
                     }
 
-                    if (recoMom.Mag() > 5.) // Different cuts for low-momentum tracks
+                    if (recoMom.Mag() > 0.5) // Different cuts for low-momentum tracks
                     {
-                        HCalEpCut = (HCalEnergy/recoMom.Mag() <= 0.5 && HCalEnergy/recoMom.Mag() >= 0.05);
-                    }
-                    else if (recoMom.Mag() <= 5. && recoMom.Mag() > 0.)
-                    {
-                        double cutValueHcal = -0.09*recoMom.Mag() + 0.5;
-                        HCalEpCut = (HCalEnergy/recoMom.Mag() >= cutValueHcal);
+                        double cutValueHcal = hCalCutFunction->Eval(recoMom.Mag());
+                        double cutWidthHcal = hCalCutWidthFunction->Eval(recoMom.Mag());
+
+                        HCalEpCut = (HCalEnergy/recoMom.Mag() >= cutValueHcal-cutWidthHcal && HCalEnergy/recoMom.Mag() <= cutValueHcal+cutWidthHcal);
                     }
                     else
                     {
@@ -807,7 +814,7 @@ void epPlots()
                                 break;
                         }
 
-                        if ((EcalHits < 4) && (HcalHits < 7))
+                        if ((EcalHits < 5) && (HcalHits < 8))
                         {
                             clusterSizePID->Fill(TMath::Abs(partPdg[simuAssoc[i]]));
                             allParticlesTrueP_PC->Fill(trueMom.Mag());
@@ -881,42 +888,44 @@ void epPlots()
     std::cout << "" << std::endl;
 
     const int n = 1000;
-    double x[n+2], yE[n+2], yH[n+2];
+    double x[n], yE[n], yH[n];
+    double yEup[n], yHup[n], yEdn[n], yHdn[n];
 
     // line points
     for (int i = 0; i < n; ++i) {
-        x[i] = 25.0 * i / (n - 1);
+        x[i] = (19.5 * i / (n - 1)) + 0.5; // from 0.5 to 20 GeV
     }
-    for (int i = 0; i < 200; ++i) {
-        yH[i] = -0.09 * x[i] + 0.5;
+    for (int i = 0; i < n; ++i) {
+        yE[i] = eCalCutFunction->Eval(x[i]);
+        yEup[i] = eCalCutFunction->Eval(x[i]) + eCalCutWidthFunction->Eval(x[i]);
+        yEdn[i] = 0.0;
     }
-    for (int i = 200; i < n; ++i) {
-        yH[i] = 0.05;
-    }
-    for (int i = 0; i < 400; ++i) {
-        yE[i] = -0.03*x[i] + 0.4;
-    }
-    for (int i = 400; i < n; ++i) {
-        yE[i] = 0.1;
+    for (int i = 0; i < n; ++i) {
+        yH[i] = hCalCutFunction->Eval(x[i]);
+        yHup[i] = hCalCutFunction->Eval(x[i]) + hCalCutWidthFunction->Eval(x[i]);
+        yHdn[i] = hCalCutFunction->Eval(x[i]) - hCalCutWidthFunction->Eval(x[i]);
     }
 
-    // close the polygon down to the bottom of the histogram
-    x[n]   = 25;  
-    yE[n] = 2.0;
-    yH[n]   = muonEpTrueEHcal->GetYaxis()->GetXmin();
-    x[n+1] = 0;  
-    yE[n+1] = 2.0;
-    yH[n+1] = muonEpTrueEHcal->GetYaxis()->GetXmin();
-
-    TGraph *EpEcalCuts = new TGraph(n+2, x, yE);
-    EpEcalCuts->SetName("EpEcalCuts");
-    EpEcalCuts->SetFillColorAlpha(kRed, 0.25);  // transparent red
-    EpEcalCuts->SetLineColor(kRed);
+    TGraph *EpEcalUp = new TGraph(n, x, yEup);
+    TGraph *EpEcalDn = new TGraph(n, x, yEdn);
+    TGraph *EpEcalL = new TGraph(n, x, yE);
+    EpEcalUp->SetName("EpEcalUpperCut");
+    EpEcalUp->SetLineColor(kRed);
+    EpEcalDn->SetName("EpEcalLowerCut");
+    EpEcalDn->SetLineColor(kRed);
+    EpEcalL->SetName("EpEcalLine");
+    EpEcalL->SetLineColor(kBlack);
     
-    TGraph *EpHcalCuts = new TGraph(n+2, x, yH);
-    EpHcalCuts->SetName("EpHcalCuts");
-    EpHcalCuts->SetFillColorAlpha(kRed, 0.25);  // transparent red
-    EpHcalCuts->SetLineColor(kRed);
+
+    TGraph *EpHcalUp = new TGraph(n, x, yHup);
+    TGraph *EpHcalDn = new TGraph(n, x, yHdn);
+    TGraph *EpHcalL = new TGraph(n, x, yH);
+    EpHcalUp->SetName("EpHcalUpperCut");
+    EpHcalUp->SetLineColor(kRed);
+    EpHcalDn->SetName("EpHcalLowerCut");
+    EpHcalDn->SetLineColor(kRed);
+    EpHcalL->SetName("EpHcalLine");
+    EpHcalL->SetLineColor(kBlack);
 
     Int_t colours[] = {3, 2, 4, 5, 6};
 
@@ -958,166 +967,429 @@ void epPlots()
     electronRecP->Draw();
     cP->Update();
 
-    TCanvas *c1 = new TCanvas("c1","c1",1100,800);
-    c1->Divide(2,3);
-    c1->cd(1);
+    TCanvas *cEpTrueEcal = new TCanvas("cEpTrueEcal","cEpTrueEcal",1100,800);
+    cEpTrueEcal->Divide(2,3);
+    cEpTrueEcal->cd(1);
     muonEpTrueEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c1->cd(2);
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpTrueEcal->cd(2);
     pionEpTrueEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c1->cd(3);
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpTrueEcal->cd(3);
     kaonEpTrueEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c1->cd(4);
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpTrueEcal->cd(4);
     protonEpTrueEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c1->cd(5);
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpTrueEcal->cd(5);
     electronEpTrueEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c1->Update();
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpTrueEcal->Update();
 
-    TCanvas *c2 = new TCanvas("c2","c2",1100,800);
-    c2->Divide(2,3);
-    c2->cd(1);
+    TCanvas *cEpRecEcal = new TCanvas("cEpRecEcal","cEpRecEcal",1100,800);
+    cEpRecEcal->Divide(2,3);
+    cEpRecEcal->cd(1);
     muonEpRecEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c2->cd(2);
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpRecEcal->cd(2);
     pionEpRecEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c2->cd(3);
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpRecEcal->cd(3);
     kaonEpRecEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c2->cd(4);
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpRecEcal->cd(4);
     protonEpRecEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c2->cd(5);
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpRecEcal->cd(5);
     electronEpRecEcal->Draw("COLZ");
-    EpEcalCuts->Draw("F SAME");
-    c2->Update();
+    EpEcalUp->Draw("SAME");
+    EpEcalDn->Draw("SAME");
+    EpEcalL->Draw("SAME");
+    cEpRecEcal->Update();
 
-    TCanvas *c3 = new TCanvas("c3","c3",1100,800);
-    c3->Divide(2,3);
-    c3->cd(1);
+    TH1D *muonEpRecEcal_0 = new TH1D("muonEpRecEcal_0","Muons E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)",50,0.,25.);
+    TH1D *muonEpRecEcal_1 = new TH1D("muonEpRecEcal_1","Muons E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean",50,0.,25.);
+    TH1D *muonEpRecEcal_2 = new TH1D("muonEpRecEcal_2","Muons E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma",50,0.,25.);
+    TH1D *pionEpRecEcal_0 = new TH1D("pionEpRecEcal_0","Pions E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)",50,0.,25.);
+    TH1D *pionEpRecEcal_1 = new TH1D("pionEpRecEcal_1","Pions E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean",50,0.,25.);
+    TH1D *pionEpRecEcal_2 = new TH1D("pionEpRecEcal_2","Pions E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma",50,0.,25.);
+
+    if (muonEpRecEcal->GetEntries() > 10 &&  pionEpRecEcal->GetEntries() > 10)
+    {
+        piEcalSlices = true;
+        muEcalSlices = true;
+        muonEpRecEcal->FitSlicesY(0,0,-1,0);;
+        muonEpRecEcal_0 = (TH1D*)gDirectory->Get("muonEpRecEcal_0");
+        muonEpRecEcal_1 = (TH1D*)gDirectory->Get("muonEpRecEcal_1");
+        muonEpRecEcal_2 = (TH1D*)gDirectory->Get("muonEpRecEcal_2");
+
+        TCanvas *slicesMuonEpRecEcal = new TCanvas("slicesMuonEpRecEcal","slicesMuonEpRecEcal",600,600);
+        slicesMuonEpRecEcal->Divide(2,2);
+        slicesMuonEpRecEcal->cd(1);
+        muonEpRecEcal->Draw("COLZ");
+        slicesMuonEpRecEcal->cd(2);
+        muonEpRecEcal_0->SetTitle("Muons E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)");
+        muonEpRecEcal_0->SetLineColor(kBlue);
+        muonEpRecEcal_0->Draw();
+        slicesMuonEpRecEcal->cd(3);
+        muonEpRecEcal_1->SetTitle("Muons E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean");
+        muonEpRecEcal_1->SetLineColor(kBlue);
+        muonEpRecEcal_1->Draw();
+        slicesMuonEpRecEcal->cd(4);
+        muonEpRecEcal_2->SetTitle("Muons E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma");
+        muonEpRecEcal_2->SetLineColor(kBlue);
+        muonEpRecEcal_2->Draw();
+        slicesMuonEpRecEcal->Update();
+
+        pionEpRecEcal->FitSlicesY(0,0,-1,0);;
+        pionEpRecEcal_0 = (TH1D*)gDirectory->Get("pionEpRecEcal_0");
+        pionEpRecEcal_1 = (TH1D*)gDirectory->Get("pionEpRecEcal_1");
+        pionEpRecEcal_2 = (TH1D*)gDirectory->Get("pionEpRecEcal_2");
+
+        TCanvas *slicesPionEpRecEcal = new TCanvas("slicesPionEpRecEcal","slicesPionEpRecEcal",600,600);
+        slicesPionEpRecEcal->Divide(2,2);
+        slicesPionEpRecEcal->cd(1);
+        muonEpRecEcal->Draw("COLZ");
+        slicesPionEpRecEcal->cd(2);
+        pionEpRecEcal_0->SetTitle("Pions E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)");
+        pionEpRecEcal_0->SetLineColor(kBlue);
+        pionEpRecEcal_0->Draw();
+        slicesPionEpRecEcal->cd(3);
+        pionEpRecEcal_1->SetTitle("Pions E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean");
+        pionEpRecEcal_1->SetLineColor(kBlue);
+        pionEpRecEcal_1->Draw();
+        slicesPionEpRecEcal->cd(4);
+        pionEpRecEcal_2->SetTitle("Pions E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma");
+        pionEpRecEcal_2->SetLineColor(kBlue);
+        pionEpRecEcal_2->Draw();
+        slicesPionEpRecEcal->Update();
+
+    }
+    else if (muonEpRecEcal->GetEntries() > pionEpRecEcal->GetEntries())
+    {
+        muEcalSlices = true;
+        muonEpRecEcal->FitSlicesY(0,0,-1,0);;
+        muonEpRecEcal_0 = (TH1D*)gDirectory->Get("muonEpRecEcal_0");
+        muonEpRecEcal_1 = (TH1D*)gDirectory->Get("muonEpRecEcal_1");
+        muonEpRecEcal_2 = (TH1D*)gDirectory->Get("muonEpRecEcal_2");
+
+        TCanvas *slicesEpRecEcal = new TCanvas("slicesEpRecEcal","slicesEpRecEcal",600,600);
+        slicesEpRecEcal->Divide(2,2);
+        slicesEpRecEcal->cd(1);
+        muonEpRecEcal->Draw("COLZ");
+        slicesEpRecEcal->cd(2);
+        muonEpRecEcal_0->SetTitle("Muons E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)");
+        muonEpRecEcal_0->SetLineColor(kBlue);
+        muonEpRecEcal_0->Draw();
+        slicesEpRecEcal->cd(3);
+        muonEpRecEcal_1->SetTitle("Muons E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean");
+        muonEpRecEcal_1->SetLineColor(kBlue);
+        muonEpRecEcal_1->Draw();
+        slicesEpRecEcal->cd(4);
+        muonEpRecEcal_2->SetTitle("Muons E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma");
+        muonEpRecEcal_2->SetLineColor(kBlue);
+        muonEpRecEcal_2->Draw();
+        slicesEpRecEcal->Update();
+
+    }
+    else if (muonEpRecEcal->GetEntries() < pionEpRecEcal->GetEntries())
+    {
+        piEcalSlices = true;
+        pionEpRecEcal->FitSlicesY(0,0,-1,0);;
+        pionEpRecEcal_0 = (TH1D*)gDirectory->Get("pionEpRecEcal_0");
+        pionEpRecEcal_1 = (TH1D*)gDirectory->Get("pionEpRecEcal_1");
+        pionEpRecEcal_2 = (TH1D*)gDirectory->Get("pionEpRecEcal_2");
+
+        TCanvas *slicesEpRecEcal = new TCanvas("slicesEpRecEcal","slicesEpRecEcal",600,600);
+        slicesEpRecEcal->Divide(2,2);
+        slicesEpRecEcal->cd(1);
+        muonEpRecEcal->Draw("COLZ");
+        slicesEpRecEcal->cd(2);
+        pionEpRecEcal_0->SetTitle("Pions E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)");
+        pionEpRecEcal_0->SetLineColor(kBlue);
+        pionEpRecEcal_0->Draw();
+        slicesEpRecEcal->cd(3);
+        pionEpRecEcal_1->SetTitle("Pions E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean");
+        pionEpRecEcal_1->SetLineColor(kBlue);
+        pionEpRecEcal_1->Draw();
+        slicesEpRecEcal->cd(4);
+        pionEpRecEcal_2->SetTitle("Pions E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma");
+        pionEpRecEcal_2->SetLineColor(kBlue);
+        pionEpRecEcal_2->Draw();
+        slicesEpRecEcal->Update();
+    }
+    
+
+
+    TCanvas *cEpTrueHcal = new TCanvas("cEpTrueHcal","cEpTrueHcal",1100,800);
+    cEpTrueHcal->Divide(2,3);
+    cEpTrueHcal->cd(1);
     muonEpTrueHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c3->cd(2);
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpTrueHcal->cd(2);
     pionEpTrueHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c3->cd(3);
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpTrueHcal->cd(3);
     kaonEpTrueHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c3->cd(4);
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpTrueHcal->cd(4);
     protonEpTrueHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c3->cd(5);
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpTrueHcal->cd(5);
     electronEpTrueHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c3->Update();
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpTrueHcal->Update();
 
-    TCanvas *c4 = new TCanvas("c4","c4",1100,800);
-    c4->Divide(2,3);
-    c4->cd(1);
+    TCanvas *cEpRecHcal = new TCanvas("cEpRecHcal","cEpRecHcal",1100,800);
+    cEpRecHcal->Divide(2,3);
+    cEpRecHcal->cd(1);
     muonEpRecHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c4->cd(2);
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpRecHcal->cd(2);
     pionEpRecHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c4->cd(3);
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpRecHcal->cd(3);
     kaonEpRecHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c4->cd(4);
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpRecHcal->cd(4);
     protonEpRecHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c4->cd(5);
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpRecHcal->cd(5);
     electronEpRecHcal->Draw("COLZ");
-    EpHcalCuts->Draw("F SAME");
-    c4->Update();
+    EpHcalUp->Draw("SAME");
+    EpHcalDn->Draw("SAME");
+    EpHcalL->Draw("SAME");
+    cEpRecHcal->Update();
 
-    TCanvas *c5 = new TCanvas("c5","c5",1100,800);
-    c5->Divide(2,3);
-    c5->cd(1);
+    TH1D *muonEpRecHcal_0;
+    TH1D *muonEpRecHcal_1;
+    TH1D *muonEpRecHcal_2;
+    TH1D *pionEpRecHcal_0;
+    TH1D *pionEpRecHcal_1;
+    TH1D *pionEpRecHcal_2;
+
+    if (muonEpRecEcal->GetEntries() > 1000 &&  pionEpRecEcal->GetEntries() > 1000)
+    {
+        piHcalSlices = true;
+        muHcalSlices = true;
+        muonEpRecHcal->FitSlicesY(0,0,-1,0);;
+        muonEpRecHcal_0 = (TH1D*)gDirectory->Get("muonEpRecHcal_0");
+        muonEpRecHcal_1 = (TH1D*)gDirectory->Get("muonEpRecHcal_1");
+        muonEpRecHcal_2 = (TH1D*)gDirectory->Get("muonEpRecHcal_2");
+
+        TCanvas *slicesMuonEpRecHcal = new TCanvas("slicesMuonEpRecHcal","slicesMuonEpRecHcal",600,600);
+        slicesMuonEpRecHcal->Divide(2,2);
+        slicesMuonEpRecHcal->cd(1);
+        muonEpRecHcal->Draw("COLZ");
+        slicesMuonEpRecHcal->cd(2);
+        muonEpRecHcal_0->SetTitle("Muons E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)");
+        muonEpRecHcal_0->SetLineColor(kBlue);
+        muonEpRecHcal_0->Draw();
+        slicesMuonEpRecHcal->cd(3);
+        muonEpRecHcal_1->SetTitle("Muons E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean");
+        muonEpRecHcal_1->SetLineColor(kBlue);
+        muonEpRecHcal_1->Draw();
+        slicesMuonEpRecHcal->cd(4);
+        muonEpRecHcal_2->SetTitle("Muons E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma");
+        muonEpRecHcal_2->SetLineColor(kBlue);
+        muonEpRecHcal_2->Draw();
+        slicesMuonEpRecHcal->Update();
+
+        pionEpRecHcal->FitSlicesY(0,0,-1,0);;
+        pionEpRecHcal_0 = (TH1D*)gDirectory->Get("pionEpRecHcal_0");
+        pionEpRecHcal_1 = (TH1D*)gDirectory->Get("pionEpRecHcal_1");
+        pionEpRecHcal_2 = (TH1D*)gDirectory->Get("pionEpRecEcal_2");
+
+        TCanvas *slicesPionEpRecHcal = new TCanvas("slicesPionEpRecHcal","slicesPionEpRecHcal",600,600);
+        slicesPionEpRecHcal->Divide(2,2);
+        slicesPionEpRecHcal->cd(1);
+        muonEpRecEcal->Draw("COLZ");
+        slicesPionEpRecHcal->cd(2);
+        pionEpRecHcal_0->SetTitle("Pions E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)");
+        pionEpRecHcal_0->SetLineColor(kBlue);
+        pionEpRecHcal_0->Draw();
+        slicesPionEpRecHcal->cd(3);
+        pionEpRecHcal_1->SetTitle("Pions E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean");
+        pionEpRecHcal_1->SetLineColor(kBlue);
+        pionEpRecHcal_1->Draw();
+        slicesPionEpRecHcal->cd(4);
+        pionEpRecHcal_2->SetTitle("Pions E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma");
+        pionEpRecHcal_2->SetLineColor(kBlue);
+        pionEpRecHcal_2->Draw();
+        slicesPionEpRecHcal->Update();
+
+    }
+    else if (muonEpRecEcal->GetEntries() > pionEpRecEcal->GetEntries())
+    {
+        muHcalSlices = true;
+        muonEpRecHcal->FitSlicesY(0,0,-1,0);;
+        muonEpRecHcal_0 = (TH1D*)gDirectory->Get("muonEpRecHcal_0");
+        muonEpRecHcal_1 = (TH1D*)gDirectory->Get("muonEpRecHcal_1");
+        muonEpRecHcal_2 = (TH1D*)gDirectory->Get("muonEpRecHcal_2");
+
+        TCanvas *slicesMuonEpRecHcal = new TCanvas("slicesMuonEpRecHcal","slicesMuonEpRecHcal",600,600);
+        slicesMuonEpRecHcal->Divide(2,2);
+        slicesMuonEpRecHcal->cd(1);
+        muonEpRecHcal->Draw("COLZ");
+        slicesMuonEpRecHcal->cd(2);
+        muonEpRecHcal_0->SetTitle("Muons E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)");
+        muonEpRecHcal_0->SetLineColor(kBlue);
+        muonEpRecHcal_0->Draw();
+        slicesMuonEpRecHcal->cd(3);
+        muonEpRecHcal_1->SetTitle("Muons E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean");
+        muonEpRecHcal_1->SetLineColor(kBlue);
+        muonEpRecHcal_1->Draw();
+        slicesMuonEpRecHcal->cd(4);
+        muonEpRecHcal_2->SetTitle("Muons E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma");
+        muonEpRecHcal_2->SetLineColor(kBlue);
+        muonEpRecHcal_2->Draw();
+        slicesMuonEpRecHcal->Update();
+
+    }
+    else if (muonEpRecEcal->GetEntries() < pionEpRecEcal->GetEntries())
+    {
+        piHcalSlices = true;
+        pionEpRecHcal->FitSlicesY(0,0,-1,0);;
+        pionEpRecHcal_0 = (TH1D*)gDirectory->Get("pionEpRecHcal_0");
+        pionEpRecHcal_1 = (TH1D*)gDirectory->Get("pionEpRecHcal_1");
+        pionEpRecHcal_2 = (TH1D*)gDirectory->Get("pionEpRecEcal_2");
+
+        TCanvas *slicesPionEpRecHcal = new TCanvas("slicesPionEpRecHcal","slicesPionEpRecHcal",600,600);
+        slicesPionEpRecHcal->Divide(2,2);
+        slicesPionEpRecHcal->cd(1);
+        muonEpRecEcal->Draw("COLZ");
+        slicesPionEpRecHcal->cd(2);
+        pionEpRecHcal_0->SetTitle("Pions E/p (reco) Slices Constant;Momentum (GeV/c);Constant E/p (reco)");
+        pionEpRecHcal_0->SetLineColor(kBlue);
+        pionEpRecHcal_0->Draw();
+        slicesPionEpRecHcal->cd(3);
+        pionEpRecHcal_1->SetTitle("Pions E/p (reco) Slice Means;Momentum (GeV/c);E/p (reco) Mean");
+        pionEpRecHcal_1->SetLineColor(kBlue);
+        pionEpRecHcal_1->Draw();
+        slicesPionEpRecHcal->cd(4);
+        pionEpRecHcal_2->SetTitle("Pions E/p (reco) Slice Sigmas;Momentum (GeV/c);E/p (reco) Sigma");
+        pionEpRecHcal_2->SetLineColor(kBlue);
+        pionEpRecHcal_2->Draw();
+        slicesPionEpRecHcal->Update();
+    }
+
+    TCanvas *cEpVsEta = new TCanvas("cEpVsEta","cEpVsEta",1100,800);
+    cEpVsEta->Divide(2,2);
+    cEpVsEta->cd(1);;
+    mupiEpTrueEcalvsEta->Draw("COLZ");
+    cEpVsEta->cd(2);
+    mupiEpRecEcalvsEta->Draw("COLZ");
+    cEpVsEta->cd(3);
+    mupiEpTrueHcalvsEta->Draw("COLZ");
+    cEpVsEta->cd(4);
+    mupiEpRecHcalvsEta->Draw("COLZ");
+    cEpVsEta->Update();
+
+    TCanvas *cEpTrueEHcal = new TCanvas("cEpTrueEHcal","cEpTrueEHcal",1100,800);
+    cEpTrueEHcal->Divide(2,3);
+    cEpTrueEHcal->cd(1);
     muonEpTrueEHcal->Draw("COLZ");
-    c5->cd(2);
+    cEpTrueEHcal->cd(2);
     pionEpTrueEHcal->Draw("COLZ");
-    c5->cd(3);
+    cEpTrueEHcal->cd(3);
     kaonEpTrueEHcal->Draw("COLZ");
-    c5->cd(4);
+    cEpTrueEHcal->cd(4);
     protonEpTrueEHcal->Draw("COLZ");
-    c5->cd(5);
+    cEpTrueEHcal->cd(5);
     electronEpTrueEHcal->Draw("COLZ");
-    c5->Update();
+    cEpTrueEHcal->Update();
 
-    TCanvas *c6 = new TCanvas("c6","c6",1100,800);
-    c6->Divide(2,3);
-    c6->cd(1);
+    TCanvas *cEpRecEHcal = new TCanvas("cEpRecEHcal","cEpRecEHcal",1100,800);
+    cEpRecEHcal->Divide(2,3);
+    cEpRecEHcal->cd(1);
     muonEpRecEHcal->Draw("COLZ");
-    c6->cd(2);
+    cEpRecEHcal->cd(2);
     pionEpRecEHcal->Draw("COLZ");
-    c6->cd(3);
+    cEpRecEHcal->cd(3);
     kaonEpRecEHcal->Draw("COLZ");
-    c6->cd(4);
+    cEpRecEHcal->cd(4);
     protonEpRecEHcal->Draw("COLZ");
-    c6->cd(5);
+    cEpRecEHcal->cd(5);
     electronEpRecEHcal->Draw("COLZ");
-    c6->Update();
+    cEpRecEHcal->Update();
 
-    TCanvas *c7 = new TCanvas("c7","c7",1100,800);
-    c7->Divide(2,3);
-    c7->cd(1);
-    muonEcalClusterSize->SetFillColor(colours[0]);
-    muonEcalClusterSize->Draw();
-    c7->cd(2);
-    pionEcalClusterSize->SetFillColor(colours[1]);
-    pionEcalClusterSize->Draw();
-    c7->cd(3);
-    kaonEcalClusterSize->SetFillColor(colours[2]);
-    kaonEcalClusterSize->Draw();
-    c7->cd(4);
-    protonEcalClusterSize->SetFillColor(colours[3]);
-    protonEcalClusterSize->Draw();
-    c7->cd(5);
-    electronEcalClusterSize->SetFillColor(colours[4]);
-    electronEcalClusterSize->Draw();
-    c7->Update();
+    TCanvas *cEcalClusterSize = new TCanvas("cEcalClusterSize","cEcalClusterSize",1100,800);
+    cEcalClusterSize->Divide(2,3);
+    cEcalClusterSize->cd(1);
+    muonEcalClusterSize->Draw("colz");
+    cEcalClusterSize->cd(2);
+    pionEcalClusterSize->Draw("colz");
+    cEcalClusterSize->cd(3);
+    kaonEcalClusterSize->Draw("colz");
+    cEcalClusterSize->cd(4);
+    protonEcalClusterSize->Draw("colz");
+    cEcalClusterSize->cd(5);
+    electronEcalClusterSize->Draw("colz");
+    cEcalClusterSize->Update();
 
-    TCanvas *c8 = new TCanvas("c8","c8",1100,800);
-    c8->Divide(2,3);
-    c8->cd(1);
-    muonHcalClusterSize->SetFillColor(colours[0]);
-    muonHcalClusterSize->Draw();
-    c8->cd(2);
-    pionHcalClusterSize->SetFillColor(colours[1]);
-    pionHcalClusterSize->Draw();
-    c8->cd(3);
-    kaonHcalClusterSize->SetFillColor(colours[2]);
-    kaonHcalClusterSize->Draw();
-    c8->cd(4);
-    protonHcalClusterSize->SetFillColor(colours[3]);
-    protonHcalClusterSize->Draw();
-    c8->cd(5);
-    electronHcalClusterSize->SetFillColor(colours[4]);
-    electronHcalClusterSize->Draw();
-    c8->Update();
+    TCanvas *cHcalClusterSize = new TCanvas("cHcalClusterSize","cHcalClusterSize",1100,800);
+    cHcalClusterSize->Divide(2,3);
+    cHcalClusterSize->cd(1);
+    muonHcalClusterSize->Draw("colz");
+    cHcalClusterSize->cd(2);
+    pionHcalClusterSize->Draw("colz");
+    cHcalClusterSize->cd(3);
+    kaonHcalClusterSize->Draw("colz");
+    cHcalClusterSize->cd(4);
+    protonHcalClusterSize->Draw("colz");
+    cHcalClusterSize->cd(5);
+    electronHcalClusterSize->Draw("colz");
+    cHcalClusterSize->Update();
 
-    TCanvas *c9 = new TCanvas("c9","c9",1100,800);
-    c9->Divide(2,3);
-    c9->cd(1);
-    muonEHcalClusterSize->SetFillColor(colours[0]);
-    muonEHcalClusterSize->Draw();
-    c9->cd(2);
-    pionEHcalClusterSize->SetFillColor(colours[1]);
-    pionEHcalClusterSize->Draw();
-    c9->cd(3);
-    kaonEHcalClusterSize->SetFillColor(colours[2]);
-    kaonEHcalClusterSize->Draw();
-    c9->cd(4);
-    protonEHcalClusterSize->SetFillColor(colours[3]);
-    protonEHcalClusterSize->Draw();
-    c9->cd(5);
-    electronEHcalClusterSize->SetFillColor(colours[4]);
-    electronEHcalClusterSize->Draw();
-    c9->Update();
+    TCanvas *cEHcalClusterSize = new TCanvas("cEHcalClusterSize","cEHcalClusterSize",1100,800);
+    cEHcalClusterSize->Divide(2,3);
+    cEHcalClusterSize->cd(1);
+    muonEHcalClusterSize->Draw("colz");
+    cEHcalClusterSize->cd(2);
+    pionEHcalClusterSize->Draw("colz");
+    cEHcalClusterSize->cd(3);
+    kaonEHcalClusterSize->Draw("colz");
+    cEHcalClusterSize->cd(4);
+    protonEHcalClusterSize->Draw("colz");
+    cEHcalClusterSize->cd(5);
+    electronEHcalClusterSize->Draw("colz");
+    cEHcalClusterSize->Update();
 
 
     TCanvas *cPIDcuts = new TCanvas("cPIDcuts","cPIDcuts",1100,800);
@@ -1295,7 +1567,9 @@ void epPlots()
     ofile->cd("..");
     ofile->mkdir("trueEcalEp");
     ofile->cd("trueEcalEp");
-    EpEcalCuts->Write();
+    EpEcalUp->Write();
+    EpEcalDn->Write();
+    EpEcalL->Write();
     protonEpTrueEcal->Write();
     electronEpTrueEcal->Write();
     pionEpTrueEcal->Write();
@@ -1304,16 +1578,32 @@ void epPlots()
     ofile->cd("..");
     ofile->mkdir("recoEcalEp");
     ofile->cd("recoEcalEp");
-    EpEcalCuts->Write();
+    EpEcalUp->Write();
+    EpEcalDn->Write();
+    EpEcalL->Write();
     protonEpRecEcal->Write();
     electronEpRecEcal->Write();
     pionEpRecEcal->Write();
+    if (pionEpRecEcal_0 != nullptr)
+    {
+        pionEpRecEcal_0->Write();
+        pionEpRecEcal_1->Write();
+        pionEpRecEcal_2->Write();
+    }
     kaonEpRecEcal->Write();
     muonEpRecEcal->Write();
+    if (muonEpRecEcal_0 != nullptr)
+    {
+        muonEpRecEcal_0->Write();
+        muonEpRecEcal_1->Write();
+        muonEpRecEcal_2->Write();
+    }
     ofile->cd("..");
     ofile->mkdir("trueHcalEp");
     ofile->cd("trueHcalEp");
-    EpHcalCuts->Write();
+    EpHcalUp->Write();
+    EpHcalDn->Write();
+    EpHcalL->Write();
     protonEpTrueHcal->Write();
     electronEpTrueHcal->Write();
     pionEpTrueHcal->Write();
@@ -1322,12 +1612,26 @@ void epPlots()
     ofile->cd("..");
     ofile->mkdir("recoHcalEp");
     ofile->cd("recoHcalEp");
-    EpHcalCuts->Write();
+    EpHcalUp->Write();
+    EpHcalDn->Write();
+    EpHcalL->Write();
     protonEpRecHcal->Write();
     electronEpRecHcal->Write();
     pionEpRecHcal->Write();
+    if (pionEpRecHcal_0 != nullptr)
+    {
+        pionEpRecHcal_0->Write();
+        pionEpRecHcal_1->Write();
+        pionEpRecHcal_2->Write();
+    }
     kaonEpRecHcal->Write();
     muonEpRecHcal->Write();
+    if (muonEpRecHcal_0 != nullptr)
+    {
+        muonEpRecHcal_0->Write();
+        muonEpRecHcal_1->Write();
+        muonEpRecHcal_2->Write();
+    }
     ofile->cd("..");
     ofile->mkdir("trueEHcal");
     ofile->cd("trueEHcal");

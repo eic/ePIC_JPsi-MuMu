@@ -9,21 +9,38 @@
 #include <TTreeReaderArray.h>
 #include <TVector3.h>
 #include <TMath.h>
+#include <TF1.h>
 
 #include "DVMP_JPsi_Analysis.h"
 
 
 bool IsMuon(TVector3 trackMom, int simuID,
             TTreeReaderArray<float>& EcalBarrelEng, TTreeReaderArray<float>& EcalEndcapPEng, TTreeReaderArray<float>& EcalEndcapNEng, 
-            TTreeReaderArray<float>& HcalBarrelEng, TTreeReaderArray<float>& HcalEndcapPEng, TTreeReaderArray<float>& HcalEndcapNEng, 
+            TTreeReaderArray<float>& HcalBarrelEng, TTreeReaderArray<float>& HcalEndcapPEng, TTreeReaderArray<float>& LFHcalEng, TTreeReaderArray<float>& HcalEndcapNEng, 
             TTreeReaderArray<unsigned int>& simuAssocEcalBarrel, TTreeReaderArray<unsigned int>& simuAssocEcalEndcapP, TTreeReaderArray<unsigned int>& simuAssocEcalEndcapN,
-            TTreeReaderArray<unsigned int>& simuAssocHcalBarrel, TTreeReaderArray<unsigned int>& simuAssocHcalEndcapP, TTreeReaderArray<unsigned int>& simuAssocHcalEndcapN)
+            TTreeReaderArray<unsigned int>& simuAssocHcalBarrel, TTreeReaderArray<unsigned int>& simuAssocHcalEndcapP, TTreeReaderArray<unsigned int>& simuAssocLFHcal, TTreeReaderArray<unsigned int>& simuAssocHcalEndcapN)
 {
 
     double ECalEnergy = 0.0;
     double HCalEnergy = 0.0;
     int ECalHits = 0;
     int HCalHits = 0;
+
+    // E/p cut functions
+
+    TF1 *eCalCutFunction = new TF1("eCalCutFunction","[0]/(x + [1])",0.,20.);
+    eCalCutFunction->SetParameter(0,0.29);
+    eCalCutFunction->SetParameter(1,0.23);
+
+    TF1 *eCalCutWidthFunction = new TF1("eCalCutWidthFunction","3*([0]/x)",0.,20.);
+    eCalCutWidthFunction->SetParameter(0,0.09);
+
+    TF1 *hCalCutFunction = new TF1("hCalCutFunction","[0]/(x + [1])",0.,20.);
+    hCalCutFunction->SetParameter(0,1.03);
+    hCalCutFunction->SetParameter(1,0.44);
+
+    TF1 *hCalCutWidthFunction = new TF1("hCalCutWidthFunction","3*([0]/x)",0.,20.);
+    hCalCutWidthFunction->SetParameter(0,0.21);
 
     if (EcalBarrelEng.GetSize() == simuAssocEcalBarrel.GetSize())
     {
@@ -82,6 +99,19 @@ bool IsMuon(TVector3 trackMom, int simuID,
             }
         }
     }
+
+    if (LFHcalEng.GetSize() == simuAssocLFHcal.GetSize())
+    {
+        for (int jL = 0; jL < simuAssocLFHcal.GetSize(); jL++) // Look for associations in the LFHcal
+        {
+            if (simuAssocLFHcal[jL] == simuID)
+            {
+                HCalEnergy += LFHcalEng[jL];
+                HCalHits += 1.;
+            }
+        }
+    }
+
             
     if (HcalEndcapNEng.GetSize() == simuAssocHcalEndcapN.GetSize())
     {
@@ -96,31 +126,27 @@ bool IsMuon(TVector3 trackMom, int simuID,
     }
 
 
-    bool ECalEpCut; // = (ECalEnergy/trackMom.Mag() < 0.4 && ECalEnergy/trackMom.Mag() >= 0.);
+    bool ECalEpCut;
     bool HCalEpCut;
 
-    if (trackMom.Mag() > 10.) // Different cuts for low-momentum tracks
+    if (trackMom.Mag() > 0.5) // Different cuts for low-momentum tracks
     {
-        ECalEpCut = (ECalEnergy/trackMom.Mag() <= 0.1 && ECalEnergy/trackMom.Mag() >= 0.);
-    }
-    else if (trackMom.Mag() <= 10. && trackMom.Mag() > 0.)
-    {
-        double cutValueEcal = -0.03*trackMom.Mag() + 0.4;
-        ECalEpCut = (ECalEnergy/trackMom.Mag() >= 0. && ECalEnergy/trackMom.Mag() <= cutValueEcal);
+        double cutValueEcal = eCalCutFunction->Eval(trackMom.Mag());
+        double cutWidthEcal = eCalCutWidthFunction->Eval(trackMom.Mag());
+
+        ECalEpCut = (ECalEnergy/trackMom.Mag() >= 0.0 && ECalEnergy/trackMom.Mag() <= cutValueEcal+cutWidthEcal);
     }
     else
     {
-        ECalEpCut = false;
+    ECalEpCut = false;
     }
 
-    if (trackMom.Mag() > 5.) // Different cuts for low-momentum tracks
+    if (trackMom.Mag() > 0.5) // Different cuts for low-momentum tracks
     {
-        HCalEpCut = (HCalEnergy/trackMom.Mag() <= 0.5 && HCalEnergy/trackMom.Mag() >= 0.05);
-    }
-    else if (trackMom.Mag() <= 5. && trackMom.Mag() > 0.)
-    {
-        double cutValueHcal = -0.09*trackMom.Mag() + 0.5;
-        HCalEpCut = (HCalEnergy/trackMom.Mag() >= cutValueHcal);
+        double cutValueHcal = hCalCutFunction->Eval(trackMom.Mag());
+        double cutWidthHcal = hCalCutWidthFunction->Eval(trackMom.Mag());
+
+        HCalEpCut = (HCalEnergy/trackMom.Mag() >= cutValueHcal-cutWidthHcal && HCalEnergy/trackMom.Mag() <= cutValueHcal+cutWidthHcal);
     }
     else
     {
